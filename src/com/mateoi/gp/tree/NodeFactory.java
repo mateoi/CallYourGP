@@ -72,5 +72,4 @@ public class NodeFactory {
 	public static NodeFactory getInstance() {
 		return instance;
 	}
-
 }

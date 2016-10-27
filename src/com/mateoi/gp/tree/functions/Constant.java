@@ -28,5 +28,4 @@ public class Constant<T> extends Arity0Node<T> {
 	public static Constant<Boolean> boolConstant(boolean value) {
 		return new Constant<>(value, Boolean.class);
 	}
-
 }
