@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.mateoi.gp.tree.Node;
 
-public interface Rules<T> {
-    public List<Node<T>> nextGeneration(List<Node<T>> trees);
+public interface Rules {
+    public List<Node> nextGeneration(List<Node> trees);
 
-    public Node<T> bestNode(List<Node<T>> trees);
+    public Node bestNode(List<Node> trees);
 }

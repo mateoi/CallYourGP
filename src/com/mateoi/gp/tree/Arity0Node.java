@@ -1,13 +1,13 @@
 package com.mateoi.gp.tree;
 
-public abstract class Arity0Node<T> extends Node<T> {
+public abstract class Arity0Node extends Node {
 
-    protected Arity0Node(String name, Class<T> type) {
-        super(name, 0, type);
+    protected Arity0Node(String name) {
+        super(name, 0);
     }
 
     @Override
-    protected void createChildren() {
+    public void createChildren() {
         // Do nothing
     }
 }

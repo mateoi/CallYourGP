@@ -1,31 +1,24 @@
 package com.mateoi.gp.tree.functions;
 
-import com.mateoi.gp.exceptions.TypeMismatch;
 import com.mateoi.gp.tree.Arity0Node;
+import com.mateoi.gp.tree.Node;
 
-public class Constant<T> extends Arity0Node<T> {
+public class Constant extends Arity0Node {
 
-	private final T value;
+    private final int value;
 
-	public Constant(T value, Class<T> type) {
-		super(value.toString(), type);
-		this.value = value;
-	}
+    public Constant(int value) {
+        super(Integer.toString(value));
+        this.value = value;
+    }
 
-	@Override
-	public T evaluate() throws TypeMismatch {
-		return this.value;
-	}
+    @Override
+    public int evaluate() {
+        return value;
+    }
 
-	public static Constant<Double> doubleConstant(double value) {
-		return new Constant<>(value, Double.class);
-	}
-
-	public static Constant<Integer> intConstant(int value) {
-		return new Constant<>(value, Integer.class);
-	}
-
-	public static Constant<Boolean> boolConstant(boolean value) {
-		return new Constant<>(value, Boolean.class);
-	}
+    @Override
+    public Node copy() {
+        return new Constant(value);
+    }
 }

@@ -1,75 +1,59 @@
 package com.mateoi.gp.tree;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
 
-@SuppressWarnings("rawtypes")
 public class NodeFactory {
 
-	private static final NodeFactory instance = new NodeFactory();
-	private Map<Class, List<Function<Integer, Node>>> typeConstructors;
-	private Map<Class, List<Supplier<Node>>> terminalConstructors;
-	private List<BiFunction<Class, Integer, Node>> genericConstructors;
+    private static final NodeFactory instance = new NodeFactory();
+    private List<Function<Integer, Node>> functions;
+    private List<Supplier<Node>> terminals;
 
-	public Node createRandomNode(Class type, int depth) throws NoConstructorsSet {
-		if (typeConstructors == null || terminalConstructors == null || genericConstructors == null) {
-			throw new NoConstructorsSet();
-		}
-		if (depth <= 0) {
-			return createTerminal(type);
-		} else {
-			return createAnyNode(type, depth);
-		}
-	}
+    public Node createRandomNode(int depth) throws NoConstructorsSet {
+        if (functions == null || terminals == null) {
+            throw new NoConstructorsSet();
+        }
+        if (depth <= 0) {
+            return createTerminal();
+        } else {
+            return createAnyNode(depth);
+        }
+    }
 
-	private Node createTerminal(Class type) {
-		final List<Supplier<Node>> list = terminalConstructors.get(type);
-		final int index = randInt(list.size());
-		return list.get(index).get();
-	}
+    public Node createTerminal() {
+        final int index = randInt(terminals.size());
+        return terminals.get(index).get();
+    }
 
-	private Node createAnyNode(Class type, int depth) {
-		final List<Function<Integer, Node>> constructors = typeConstructors.get(type);
-		final int total = constructors.size() + genericConstructors.size();
-		final int index = randInt(total);
-		if (index < constructors.size()) {
-			final Function<Integer, Node> c = constructors.get(index);
-			return c.apply(depth);
-		} else {
-			final BiFunction<Class, Integer, Node> c = genericConstructors.get(index - constructors.size());
-			return c.apply(type, depth);
-		}
-	}
+    private Node createAnyNode(int depth) {
+        final int index = randInt(functions.size() + terminals.size());
+        if (index < functions.size()) {
+            final Function<Integer, Node> c = functions.get(index);
+            return c.apply(depth);
+        } else {
+            final Supplier<Node> c = terminals.get(index - functions.size());
+            return c.get();
+        }
+    }
 
-	public void setConstructors(Map<Class, List<Function<Integer, Node>>> typeConstructors,
-	        Map<Class, List<Supplier<Node>>> terminalConstructors,
-	        List<BiFunction<Class, Integer, Node>> genericConstructors) {
-		this.typeConstructors = typeConstructors;
-		this.terminalConstructors = terminalConstructors;
-		this.genericConstructors = genericConstructors;
-	}
+    public void setConstructors(List<Function<Integer, Node>> functions, List<Supplier<Node>> terminals) {
+        this.terminals = terminals;
+        this.functions = functions;
+    }
 
-	private int randInt(int max) {
-		final double rand = Math.random();
-		return (int) (rand * max);
-	}
+    private int randInt(int max) {
+        final double rand = Math.random();
+        return (int) (rand * max);
+    }
 
-	private NodeFactory() {
-		// private to prevent instantiation
-	}
+    private NodeFactory() {
+        // private to prevent instantiation
+    }
 
-	public static void putTerminalsInNodes(List<Supplier<Node>> terminals, List<Function<Integer, Node>> nodes) {
-		for (final Supplier<Node> terminal : terminals) {
-			nodes.add(i -> terminal.get());
-		}
-	}
-
-	public static NodeFactory getInstance() {
-		return instance;
-	}
+    public static NodeFactory getInstance() {
+        return instance;
+    }
 }
