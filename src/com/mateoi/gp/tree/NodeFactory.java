@@ -8,6 +8,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.mateoi.gp.tree.functions.Constant;
+
 @SuppressWarnings("rawtypes")
 public class NodeFactory {
 
@@ -50,6 +52,21 @@ public class NodeFactory {
 
     private NodeFactory() {
         // private to prevent instantiation
+    	List<Function<Integer, Node>> doubles = new ArrayList<>();
+    	doubles.add(d->Constant.doubleConstant(0.0));
+    	doubles.add(d->Constant.doubleConstant(1.0));
+    	doubles.add(d->Constant.doubleConstant(-1.0));
+    	doubles.add(d->Constant.doubleConstant(2.0));
+    	doubles.add(d->Constant.doubleConstant(-2.0));
+    	typeConstructors.put(Double.class, doubles);
+    	
+    	List<Supplier<Node>> doubleTerminals = new ArrayList<>();
+    	doubleTerminals.add(() -> Constant.doubleConstant(0.0));
+    	doubleTerminals.add(() -> Constant.doubleConstant(1.0));
+    	doubleTerminals.add(() -> Constant.doubleConstant(-1.0));
+    	doubleTerminals.add(() -> Constant.doubleConstant(2.0));
+    	doubleTerminals.add(() -> Constant.doubleConstant(-2.0));
+    	terminalConstructors.put(Double.class, doubleTerminals);
     }
 
     public static NodeFactory getInstance() {

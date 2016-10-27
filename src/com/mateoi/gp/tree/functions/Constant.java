@@ -21,11 +21,11 @@ public class Constant<T> extends Arity0Node<T> {
         return new Constant<>(value, Double.class);
     }
 
-    public static Constant<Integer> doubleConstant(int value) {
+    public static Constant<Integer> intConstant(int value) {
         return new Constant<>(value, Integer.class);
     }
 
-    public static Constant<Boolean> doubleConstant(boolean value) {
+    public static Constant<Boolean> boolConstant(boolean value) {
         return new Constant<>(value, Boolean.class);
     }
 
