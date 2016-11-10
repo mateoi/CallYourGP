@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
-import com.mateoi.gp.rules.NoRules;
+import com.mateoi.gp.games.Game;
+import com.mateoi.gp.games.Nim1D;
 import com.mateoi.gp.rules.Rules;
+import com.mateoi.gp.rules.TournamentRules;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 
 public class Main {
 
     public static final int POPULATION = 5000;
-    public static final int DEPTH = 3;
-    public static final int GENERATIONS = 100;
+    public static final int DEPTH = 5;
+    public static final int GENERATIONS = 50;
     public static final double CROSSOVER_RATE = 0.9;
-    public static final double MUTATION_RATE = 0.015;
+    public static final double MUTATION_RATE = 0.02;
 
     private List<Node> trees = new ArrayList<>();
     private final Rules rules;
@@ -28,9 +30,9 @@ public class Main {
     private void initializeNodes() {
         try {
             for (int i = 0; i < POPULATION; i++) {
-                trees.add(NodeFactory.getInstance().createRandomNode(DEPTH));
+                trees.add(NodeFactory.getInstance().createFunction(DEPTH));
             }
-        } catch (final NoConstructorsSet e) {
+        } catch (NoConstructorsSet e) {
             System.exit(1);
         }
     }
@@ -43,9 +45,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        final Rules rules = new NoRules();
-        final Main main = new Main(rules);
-        final Node winner = main.run();
+        Game game = new Nim1D(8);
+        Rules rules = new TournamentRules(CROSSOVER_RATE, MUTATION_RATE, game);
+        Main main = new Main(rules);
+        Node winner = main.run();
         System.out.println(winner);
     }
 }

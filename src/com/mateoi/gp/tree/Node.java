@@ -26,7 +26,7 @@ public abstract class Node {
     @Override
     public String toString() {
         String s = "(" + name;
-        for (final Node n : arguments) {
+        for (Node n : arguments) {
             s += " " + n.toString();
         }
         s += ")";
@@ -51,9 +51,9 @@ public abstract class Node {
     }
 
     public Node crossover(Node other) {
-        final Node child = this.copy();
-        final int oldBranchIndex = ((int) (Math.random() * child.size() - 1)) + 1;
-        final Node branchToAdd = other.getRandomSubNode().copy();
+        Node child = this.copy();
+        int oldBranchIndex = ((int) (Math.random() * child.size() - 1)) + 1;
+        Node branchToAdd = other.getRandomSubNode().copy();
         child.setNode(oldBranchIndex, branchToAdd);
         child.trim(depth);
         return child;
@@ -61,27 +61,27 @@ public abstract class Node {
 
     public Node mutate() {
         try {
-            final Node random = NodeFactory.getInstance().createRandomNode(depth);
+            Node random = NodeFactory.getInstance().createRandomNode(depth);
             return this.crossover(random);
-        } catch (final NoConstructorsSet e) {
+        } catch (NoConstructorsSet e) {
             return this.copy();
         }
     }
 
     public Node getRandomSubNode() {
-        final int index = ((int) Math.random() * size());
+        int index = ((int) Math.random() * size());
         return getNode(index);
     }
 
     public void trim(int maxDepth) {
         if (maxDepth <= 1) {
-            final int children = arguments.size();
+            int children = arguments.size();
             arguments.clear();
             for (int i = 0; i < children; i++) {
                 arguments.add(NodeFactory.getInstance().createTerminal());
             }
         } else {
-            for (final Node child : arguments) {
+            for (Node child : arguments) {
                 child.trim(maxDepth - 1);
             }
         }
@@ -91,8 +91,8 @@ public abstract class Node {
         if (index == 0) {
             return this;
         } else {
-            for (final Node child : arguments) {
-                final int childSize = child.size();
+            for (Node child : arguments) {
+                int childSize = child.size();
                 if (index <= childSize) {
                     return child.getNode(index - 1);
                 } else {
@@ -112,7 +112,7 @@ public abstract class Node {
                 arguments.set(i, node);
                 return;
             } else {
-                final int childSize = arguments.get(i).size();
+                int childSize = arguments.get(i).size();
                 if (index <= childSize) {
                     arguments.get(i).setNode(index - 1, node);
                     return;
@@ -121,25 +121,18 @@ public abstract class Node {
                 }
             }
         }
-        throw new IndexOutOfBoundsException();
+        throw new IndexOutOfBoundsException("value: " + index + ", size: " + this.size());
     }
 
     public int size() {
         int size = 0;
-        for (final Node child : arguments) {
+        for (Node child : arguments) {
             size += child.size();
         }
         return 1 + size;
     }
 
-    public void createChildren() {
-        try {
-            final Node child = NodeFactory.getInstance().createRandomNode(depth - 1);
-            arguments.add(child);
-        } catch (final NoConstructorsSet e) {
-            System.exit(1);
-        }
-    }
+    public abstract void createChildren();
 
     public abstract int evaluate();
 

@@ -15,7 +15,7 @@ public class IfNode extends Arity3Node {
 
     public IfNode(int depth, Node test, Node ifTrue, Node ifFalse) {
         super("if", depth, (b, t, f) -> b == 1 ? t : f);
-        final List<Node> children = new ArrayList<>();
+        List<Node> children = new ArrayList<>();
         children.add(test);
         children.add(ifTrue);
         children.add(ifFalse);
@@ -25,18 +25,18 @@ public class IfNode extends Arity3Node {
 
     @Override
     public int evaluate() { // Override to shortcut execution
-        final Node test = getArguments().get(0);
-        final boolean testValue = test.evaluate() == 1;
-        final int index = testValue ? 1 : 2;
-        final Node result = getArguments().get(index);
+        Node test = getArguments().get(0);
+        boolean testValue = test.evaluate() == 1;
+        int index = testValue ? 1 : 2;
+        Node result = getArguments().get(index);
         return result.evaluate();
     }
 
     @Override
     public Node copy() {
-        final Node test = getArguments().get(0).copy();
-        final Node ifTrue = getArguments().get(1).copy();
-        final Node ifFalse = getArguments().get(2).copy();
+        Node test = getArguments().get(0).copy();
+        Node ifTrue = getArguments().get(1).copy();
+        Node ifFalse = getArguments().get(2).copy();
         return new IfNode(getDepth(), test, ifTrue, ifFalse);
     }
 }

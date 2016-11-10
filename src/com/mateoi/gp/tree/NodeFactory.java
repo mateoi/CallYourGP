@@ -23,18 +23,33 @@ public class NodeFactory {
         }
     }
 
+    public Node createFunction(int depth) throws NoConstructorsSet {
+        if (functions == null || terminals == null) {
+            throw new NoConstructorsSet();
+        }
+
+        if (depth <= 0) {
+            return createTerminal();
+        } else {
+            int index = randInt(functions.size());
+            Function<Integer, Node> c = functions.get(index);
+            return c.apply(depth);
+        }
+
+    }
+
     public Node createTerminal() {
-        final int index = randInt(terminals.size());
+        int index = randInt(terminals.size());
         return terminals.get(index).get();
     }
 
     private Node createAnyNode(int depth) {
-        final int index = randInt(functions.size() + terminals.size());
+        int index = randInt(functions.size() + terminals.size());
         if (index < functions.size()) {
-            final Function<Integer, Node> c = functions.get(index);
+            Function<Integer, Node> c = functions.get(index);
             return c.apply(depth);
         } else {
-            final Supplier<Node> c = terminals.get(index - functions.size());
+            Supplier<Node> c = terminals.get(index - functions.size());
             return c.get();
         }
     }
@@ -45,7 +60,7 @@ public class NodeFactory {
     }
 
     private int randInt(int max) {
-        final double rand = Math.random();
+        double rand = Math.random();
         return (int) (rand * max);
     }
 

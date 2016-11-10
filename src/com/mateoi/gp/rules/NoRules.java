@@ -16,8 +16,8 @@ import com.mateoi.gp.tree.functions.IfNode;
 public class NoRules implements Rules {
 
     public NoRules() {
-        final List<Function<Integer, Node>> functions = new ArrayList<>();
-        final List<Supplier<Node>> terminals = new ArrayList<>();
+        List<Function<Integer, Node>> functions = new ArrayList<>();
+        List<Supplier<Node>> terminals = new ArrayList<>();
 
         terminals.add(() -> new Constant(-2));
         terminals.add(() -> new Constant(-1));

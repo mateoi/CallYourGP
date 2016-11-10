@@ -17,7 +17,7 @@ public class ArithmeticPredicate extends Arity2Node {
     public ArithmeticPredicate(String name, int depth, BiFunction<Integer, Integer, Integer> function, Node left,
             Node right) {
         super(name, depth, function);
-        final List<Node> children = new ArrayList<>();
+        List<Node> children = new ArrayList<>();
         children.add(left);
         children.add(right);
         setArguments(children);
@@ -33,8 +33,8 @@ public class ArithmeticPredicate extends Arity2Node {
 
     @Override
     public Node copy() {
-        final Node left = getArguments().get(0).copy();
-        final Node right = getArguments().get(1).copy();
+        Node left = getArguments().get(0).copy();
+        Node right = getArguments().get(1).copy();
         return new ArithmeticPredicate(getName(), getDepth(), getFunction(), left, right);
     }
 }
