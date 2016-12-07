@@ -2,8 +2,10 @@ package com.mateoi.gp.rules;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
@@ -16,7 +18,9 @@ import com.mateoi.gp.tree.functions.IfNode;
 public class NoRules implements Rules {
 
     public NoRules() {
-        List<Function<Integer, Node>> functions = new ArrayList<>();
+        List<Function<Integer, Node>> arity1 = new ArrayList<>();
+        List<Function<Integer, Node>> arity2 = new ArrayList<>();
+        List<Function<Integer, Node>> arity3 = new ArrayList<>();
         List<Supplier<Node>> terminals = new ArrayList<>();
 
         terminals.add(() -> new Constant(-2));
@@ -25,31 +29,31 @@ public class NoRules implements Rules {
         terminals.add(() -> new Constant(1));
         terminals.add(() -> new Constant(2));
 
-        functions.add(d -> ArithmeticNode.plus(d));
-        functions.add(d -> ArithmeticNode.minus(d));
-        functions.add(d -> ArithmeticNode.mod(d));
-        functions.add(d -> ArithmeticNode.times(d));
-        functions.add(d -> ArithmeticNode.div(d));
+        arity2.add(d -> ArithmeticNode.plus(d));
+        arity2.add(d -> ArithmeticNode.minus(d));
+        arity2.add(d -> ArithmeticNode.mod(d));
+        arity2.add(d -> ArithmeticNode.times(d));
+        arity2.add(d -> ArithmeticNode.div(d));
 
-        functions.add(d -> ArithmeticPredicate.equalsNode(d));
-        functions.add(d -> ArithmeticPredicate.gt(d));
-        functions.add(d -> BooleanNode.and(d));
-        functions.add(d -> BooleanNode.or(d));
-        functions.add(d -> BooleanNode.xor(d));
+        arity2.add(d -> ArithmeticPredicate.equalsNode(d));
+        arity2.add(d -> ArithmeticPredicate.gt(d));
+        arity2.add(d -> BooleanNode.and(d));
+        arity2.add(d -> BooleanNode.or(d));
+        arity2.add(d -> BooleanNode.xor(d));
 
-        functions.add(d -> new IfNode(d));
+        arity3.add(d -> new IfNode(d));
 
-        NodeFactory.getInstance().setConstructors(functions, terminals);
+        NodeFactory.getInstance().setConstructors(arity1, arity2, arity3, terminals);
     }
 
     @Override
-    public List<Node> nextGeneration(List<Node> trees) {
-        return trees;
+    public Map<Node, Double> score(List<Node> trees) {
+        return trees.stream().collect(Collectors.toMap(Function.identity(), v -> 1.));
     }
 
     @Override
-    public Node bestNode(List<Node> trees) {
-        return trees.get(0);
+    public List<Node> bestNodes(List<Node> trees, int n) {
+        return trees.subList(0, n);
     }
 
 }

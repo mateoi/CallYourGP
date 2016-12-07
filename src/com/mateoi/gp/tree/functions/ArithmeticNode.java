@@ -9,13 +9,12 @@ import com.mateoi.gp.tree.Node;
 
 public class ArithmeticNode extends Arity2Node {
 
-    public ArithmeticNode(String name, int depth, BiFunction<Integer, Integer, Integer> function) {
+    public ArithmeticNode(String name, int depth, BiFunction<Double, Double, Double> function) {
         super(name, depth, function);
         createChildren();
     }
 
-    public ArithmeticNode(String name, int depth, BiFunction<Integer, Integer, Integer> function, Node left,
-            Node right) {
+    public ArithmeticNode(String name, int depth, BiFunction<Double, Double, Double> function, Node left, Node right) {
         super(name, depth, function);
         List<Node> children = new ArrayList<>();
         children.add(left);

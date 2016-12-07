@@ -9,12 +9,12 @@ import com.mateoi.gp.tree.Node;
 
 public class ArithmeticPredicate extends Arity2Node {
 
-    public ArithmeticPredicate(String name, int depth, BiFunction<Integer, Integer, Integer> function) {
+    public ArithmeticPredicate(String name, int depth, BiFunction<Double, Double, Double> function) {
         super(name, depth, function);
         createChildren();
     }
 
-    public ArithmeticPredicate(String name, int depth, BiFunction<Integer, Integer, Integer> function, Node left,
+    public ArithmeticPredicate(String name, int depth, BiFunction<Double, Double, Double> function, Node left,
             Node right) {
         super(name, depth, function);
         List<Node> children = new ArrayList<>();
@@ -24,11 +24,11 @@ public class ArithmeticPredicate extends Arity2Node {
     }
 
     public static ArithmeticPredicate equalsNode(int depth) {
-        return new ArithmeticPredicate("==", depth, (a, b) -> a == b ? 1 : 0);
+        return new ArithmeticPredicate("==", depth, (a, b) -> a == b ? 1. : 0.);
     }
 
     public static ArithmeticPredicate gt(int depth) {
-        return new ArithmeticPredicate(">", depth, (a, b) -> a > b ? 1 : 0);
+        return new ArithmeticPredicate(">", depth, (a, b) -> a > b ? 1. : 0.);
     }
 
     @Override

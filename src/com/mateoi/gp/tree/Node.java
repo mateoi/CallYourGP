@@ -3,12 +3,10 @@ package com.mateoi.gp.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mateoi.gp.exceptions.NoConstructorsSet;
-
 public abstract class Node {
 
     private final String name;
-    private final int depth;
+    private int depth;
     private final List<Node> arguments;
 
     protected Node(String name, int depth) {
@@ -59,13 +57,31 @@ public abstract class Node {
         return child;
     }
 
-    public Node mutate() {
-        try {
-            Node random = NodeFactory.getInstance().createRandomNode(depth);
-            return this.crossover(random);
-        } catch (NoConstructorsSet e) {
-            return this.copy();
+    public Node mutate(double probability) {
+        Node child = null;
+        for (int i = 0; i < size(); i++) {
+            if (Math.random() < probability) {
+                Node toChange = getNode(i);
+                Node newNode = toChange.changeHead();
+                if (i == 0) {
+                    child = newNode;
+                } else {
+                    child = this.copy();
+                    child.setNode(i, newNode);
+                }
+                break;
+            }
         }
+        return child == null ? this.copy() : child;
+    }
+
+    private Node changeHead() {
+        int arity = arguments.size();
+        Node newNode = NodeFactory.getInstance().createByArity(arity);
+        newNode.setDepth(depth);
+        newNode.getArguments().clear();
+        arguments.forEach(n -> newNode.getArguments().add(n.copy()));
+        return newNode;
     }
 
     public Node getRandomSubNode() {
@@ -104,6 +120,7 @@ public abstract class Node {
     }
 
     public void setNode(int index, Node node) {
+        int originalIndex = index;
         if (index <= 0) {
             throw new IndexOutOfBoundsException();
         }
@@ -121,7 +138,8 @@ public abstract class Node {
                 }
             }
         }
-        throw new IndexOutOfBoundsException("value: " + index + ", size: " + this.size());
+        throw new IndexOutOfBoundsException(
+                "index: " + originalIndex + ", size: " + this.size() + "\ntree: " + this + "\nargunents: " + arguments);
     }
 
     public int size() {
@@ -132,9 +150,13 @@ public abstract class Node {
         return 1 + size;
     }
 
+    private void setDepth(int depth) {
+        this.depth = depth;
+    }
+
     public abstract void createChildren();
 
-    public abstract int evaluate();
+    public abstract double evaluate();
 
     public abstract Node copy();
 

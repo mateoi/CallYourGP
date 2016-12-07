@@ -5,15 +5,15 @@ import com.mateoi.gp.tree.Node;
 
 public class Constant extends Arity0Node {
 
-    private final int value;
+    private final double value;
 
-    public Constant(int value) {
-        super(Integer.toString(value));
+    public Constant(double value) {
+        super(Double.toString(value));
         this.value = value;
     }
 
     @Override
-    public int evaluate() {
+    public double evaluate() {
         return value;
     }
 

@@ -1,5 +1,6 @@
 package com.mateoi.gp.tree;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -10,6 +11,9 @@ public class NodeFactory {
 
     private static final NodeFactory instance = new NodeFactory();
     private List<Function<Integer, Node>> functions;
+    private List<Function<Integer, Node>> arity1;
+    private List<Function<Integer, Node>> arity2;
+    private List<Function<Integer, Node>> arity3;
     private List<Supplier<Node>> terminals;
 
     public Node createRandomNode(int depth) throws NoConstructorsSet {
@@ -38,6 +42,24 @@ public class NodeFactory {
 
     }
 
+    public Node createByArity(int arity) {
+        List<Function<Integer, Node>> constructors;
+        switch (arity) {
+        case 0:
+            return createTerminal();
+        case 1:
+            constructors = arity1;
+            break;
+        case 2:
+            constructors = arity2;
+            break;
+        default:
+            constructors = arity3;
+        }
+        int index = randInt(constructors.size());
+        return constructors.get(index).apply(0);
+    }
+
     public Node createTerminal() {
         int index = randInt(terminals.size());
         return terminals.get(index).get();
@@ -54,9 +76,15 @@ public class NodeFactory {
         }
     }
 
-    public void setConstructors(List<Function<Integer, Node>> functions, List<Supplier<Node>> terminals) {
+    public void setConstructors(List<Function<Integer, Node>> arity1, List<Function<Integer, Node>> arity2,
+            List<Function<Integer, Node>> arity3, List<Supplier<Node>> terminals) {
         this.terminals = terminals;
-        this.functions = functions;
+        this.arity1 = arity1;
+        this.arity2 = arity2;
+        this.arity3 = arity3;
+        functions = new ArrayList<>(arity1);
+        functions.addAll(arity2);
+        functions.addAll(arity3);
     }
 
     private int randInt(int max) {

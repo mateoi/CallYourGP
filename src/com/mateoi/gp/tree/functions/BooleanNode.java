@@ -9,12 +9,12 @@ import com.mateoi.gp.tree.Node;
 
 public class BooleanNode extends Arity2Node {
 
-    public BooleanNode(String name, int depth, BiFunction<Integer, Integer, Integer> function) {
+    public BooleanNode(String name, int depth, BiFunction<Double, Double, Double> function) {
         super(name, depth, function);
         createChildren();
     }
 
-    public BooleanNode(String name, int depth, BiFunction<Integer, Integer, Integer> function, Node left, Node right) {
+    public BooleanNode(String name, int depth, BiFunction<Double, Double, Double> function, Node left, Node right) {
         super(name, depth, function);
         List<Node> children = new ArrayList<>();
         children.add(left);
@@ -23,15 +23,15 @@ public class BooleanNode extends Arity2Node {
     }
 
     public static BooleanNode and(int depth) {
-        return new BooleanNode("and", depth, (a, b) -> (a == 1 && b == 1) ? 1 : 0);
+        return new BooleanNode("and", depth, (a, b) -> (a >= 1 && b >= 1) ? 1. : 0.);
     }
 
     public static BooleanNode or(int depth) {
-        return new BooleanNode("or", depth, (a, b) -> (a == 1 || b == 1) ? 1 : 0);
+        return new BooleanNode("or", depth, (a, b) -> (a >= 1 || b >= 1) ? 1. : 0.);
     }
 
     public static BooleanNode xor(int depth) {
-        return new BooleanNode("xor", depth, (a, b) -> (a != b) ? 1 : 0);
+        return new BooleanNode("xor", depth, (a, b) -> (a >= 1 && b < 1 || a < 1 && b >= 1) ? 1. : 0.);
     }
 
     @Override

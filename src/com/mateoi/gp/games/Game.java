@@ -1,12 +1,10 @@
 package com.mateoi.gp.games;
 
+import com.mateoi.gp.tree.Node;
+
 public interface Game {
 
-    public void reset();
+    public int playHeadToHead(Node... trees);
 
-    public boolean isFinished();
-
-    public int getWinner();
-
-    public void move(int player, int move);
+    public double[] getFitness(Node... trees);
 }

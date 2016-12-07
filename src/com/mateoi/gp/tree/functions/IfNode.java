@@ -20,11 +20,10 @@ public class IfNode extends Arity3Node {
         children.add(ifTrue);
         children.add(ifFalse);
         setArguments(children);
-
     }
 
     @Override
-    public int evaluate() { // Override to shortcut execution
+    public double evaluate() { // Override to shortcut execution
         Node test = getArguments().get(0);
         boolean testValue = test.evaluate() == 1;
         int index = testValue ? 1 : 2;
