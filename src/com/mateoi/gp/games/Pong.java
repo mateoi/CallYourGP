@@ -1,6 +1,7 @@
 package com.mateoi.gp.games;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -84,7 +85,7 @@ public class Pong implements Game {
     }
 
     @Override
-    public double[] getFitness(Node... trees) {
+    public List<Double> getFitness(Node... trees) {
         Node leftPlayer = trees[0];
         Node rightPlayer = trees[1];
         double rightScore = 0;
@@ -94,8 +95,7 @@ public class Pong implements Game {
             leftScore += scores[0];
             rightScore += scores[1];
         }
-        double[] results = { leftScore, rightScore };
-        return results;
+        return Arrays.asList(leftScore, rightScore);
     }
 
     private double[] grade(Node leftPlayer, Node rightPlayer) {
@@ -111,7 +111,7 @@ public class Pong implements Game {
         double score = game.getAverageRally();
         int winner = game.getLeftScore() >= winningScore ? 0 : 1;
         double[] scores = { score, score };
-        scores[winner] += 0.2;
+        scores[winner] += 0.1;
         scores[0] += game.getLeftHits();
         scores[1] += game.getRightHits();
         return scores;
