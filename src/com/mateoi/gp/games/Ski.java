@@ -12,188 +12,195 @@ import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.functions.ArithmeticNode;
 import com.mateoi.gp.tree.functions.Constant;
+import com.mateoi.gp.tree.functions.Negate;
 import com.mateoi.ski.Player;
 import com.mateoi.ski.Position;
 import com.mateoi.ski.SkiGame;
 
 public class Ski implements Game {
-	private final int rounds;
-	private int winningScore = 1000;
+    private final int rounds;
+    private int winningScore = 1000;
 
-	public Ski(int rounds) {
-		this.rounds = rounds;
+    public Ski(int rounds) {
+        this.rounds = rounds;
 
-		List<Function<Integer, Node>> arity1 = new ArrayList<>();
-		List<Function<Integer, Node>> arity2 = new ArrayList<>();
-		List<Function<Integer, Node>> arity3 = new ArrayList<>();
-		List<Supplier<Node>> terminals = new ArrayList<>();
+        List<Function<Integer, Node>> arity1 = new ArrayList<>();
+        List<Function<Integer, Node>> arity2 = new ArrayList<>();
+        List<Function<Integer, Node>> arity3 = new ArrayList<>();
+        List<Supplier<Node>> terminals = new ArrayList<>();
 
-		for (int i = 0; i < 20; i++) {
-			terminals.add(() -> new Constant(Math.random() * 8 - 4));
-		}
+        terminals.add(() -> new Constant(-1));
+        terminals.add(() -> new Constant(0));
+        terminals.add(() -> new Constant(1));
 
-		terminals.add(() -> new SelfX());
-		terminals.add(() -> new SelfY());
-		terminals.add(() -> new TreeX());
-		terminals.add(() -> new TreeY());
-		terminals.add(() -> new FieldWidth());
-		terminals.add(() -> new FieldHeight());
+        for (int i = 0; i < 10; i++) {
+            terminals.add(() -> new Constant(Math.random() * 6 - 3));
+        }
 
-		arity2.add(d -> ArithmeticNode.plus(d));
-		arity2.add(d -> ArithmeticNode.minus(d));
-		arity2.add(d -> ArithmeticNode.times(d));
-		arity2.add(d -> ArithmeticNode.div(d));
+        terminals.add(() -> new SelfX());
+        terminals.add(() -> new SelfY());
+        terminals.add(() -> new TreeX());
+        terminals.add(() -> new TreeY());
+        terminals.add(() -> new FieldWidth());
+        terminals.add(() -> new FieldHeight());
 
-		NodeFactory.getInstance().setConstructors(arity1, arity2, arity3, terminals);
+        arity1.add(d -> new Negate(d));
 
-	}
+        arity2.add(d -> ArithmeticNode.plus(d));
+        arity2.add(d -> ArithmeticNode.minus(d));
+        arity2.add(d -> ArithmeticNode.times(d));
+        arity2.add(d -> ArithmeticNode.div(d));
 
-	@Override
-	public int playHeadToHead(Node... trees) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+        NodeFactory.getInstance().setConstructors(arity1, arity2, arity3, terminals);
 
-	@Override
-	public List<Double> getFitness(Node... trees) {
-		return Arrays.stream(trees).map(t -> playRounds(t)).collect(Collectors.toList());
-	}
+    }
 
-	private double playRounds(Node tree) {
-		double total = 0;
-		for (int i = 0; i < rounds; i++) {
-			total += score(tree);
-		}
-		return total;
-	}
+    @Override
+    public int playHeadToHead(Node... trees) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	private double score(Node tree) {
-		SkiProvider.getInstance().resetGame();
-		SkiGame game = SkiProvider.getInstance().getGame();
-		while (game.getScore() < winningScore && !game.isDone()) {
-			int move = (int) tree.evaluate();
-			game.advanceFrame(clipMove(move));
-		}
-		return game.getScore();
-	}
+    @Override
+    public List<Double> getFitness(Node... trees) {
+        return Arrays.stream(trees).map(t -> playRounds(t)).collect(Collectors.toList());
+    }
 
-	private int clipMove(int move) {
-		return move <= -1 ? -1 : move >= 1 ? 1 : 0;
-	}
+    private double playRounds(Node tree) {
+        double total = 0;
+        for (int i = 0; i < rounds; i++) {
+            total += score(tree);
+        }
+        return total;
+    }
 
-	public Player nodePlayer(Node node) {
-		return new Player() {
+    private double score(Node tree) {
+        SkiProvider.getInstance().resetGame();
+        SkiGame game = SkiProvider.getInstance().getGame();
+        while (game.getScore() < winningScore && !game.isDone()) {
+            int move = (int) tree.evaluate();
+            game.advanceFrame(clipMove(move));
+        }
+        return game.getScore();
+    }
 
-			@Override
-			public int move(SkiGame game) {
-				double move = node.evaluate();
-				return clipMove((int) move);
-			}
-		};
-	}
+    private int clipMove(int move) {
+        return move <= -1 ? -1 : move >= 1 ? 1 : 0;
+    }
 
-	public class SelfX extends Arity0Node {
+    public Player nodePlayer(Node node) {
+        return new Player() {
 
-		protected SelfX() {
-			super("Self_X");
-		}
+            @Override
+            public int move(SkiGame game) {
+                double move = node.evaluate();
+                return clipMove((int) move);
+            }
+        };
+    }
 
-		@Override
-		public double evaluate() {
-			return SkiProvider.getInstance().getGame().getPlayerX();
-		}
+    public static class SelfX extends Arity0Node {
 
-		@Override
-		public Node copy() {
-			return new SelfX();
-		}
-	}
+        public SelfX() {
+            super("Self_X");
+        }
 
-	public class SelfY extends Arity0Node {
+        @Override
+        public double evaluate() {
+            return SkiProvider.getInstance().getGame().getPlayerX();
+        }
 
-		protected SelfY() {
-			super("Self_Y");
-		}
+        @Override
+        public Node copy() {
+            return new SelfX();
+        }
+    }
 
-		@Override
-		public double evaluate() {
-			return SkiProvider.getInstance().getGame().getPlayerY();
-		}
+    public static class SelfY extends Arity0Node {
 
-		@Override
-		public Node copy() {
-			return new SelfY();
-		}
-	}
+        public SelfY() {
+            super("Self_Y");
+        }
 
-	public class TreeX extends Arity0Node {
+        @Override
+        public double evaluate() {
+            return SkiProvider.getInstance().getGame().getPlayerY();
+        }
 
-		protected TreeX() {
-			super("Tree_X");
-		}
+        @Override
+        public Node copy() {
+            return new SelfY();
+        }
+    }
 
-		@Override
-		public double evaluate() {
-			List<Position> trees = SkiProvider.getInstance().getGame().getTreePositions();
-			return trees.size() > 0 ? trees.get(0).getX() : 0;
-		}
+    public static class TreeX extends Arity0Node {
 
-		@Override
-		public Node copy() {
-			return new TreeX();
-		}
-	}
+        public TreeX() {
+            super("Tree_X");
+        }
 
-	public class TreeY extends Arity0Node {
+        @Override
+        public double evaluate() {
+            List<Position> trees = SkiProvider.getInstance().getGame().getTreePositions();
+            return trees.size() > 0 ? trees.get(0).getX() : 0;
+        }
 
-		protected TreeY() {
-			super("Tree_Y");
-		}
+        @Override
+        public Node copy() {
+            return new TreeX();
+        }
+    }
 
-		@Override
-		public double evaluate() {
-			List<Position> trees = SkiProvider.getInstance().getGame().getTreePositions();
-			return trees.size() > 0 ? trees.get(0).getY() : 0;
-		}
+    public static class TreeY extends Arity0Node {
 
-		@Override
-		public Node copy() {
-			return new TreeY();
-		}
-	}
+        public TreeY() {
+            super("Tree_Y");
+        }
 
-	public class FieldHeight extends Arity0Node {
+        @Override
+        public double evaluate() {
+            List<Position> trees = SkiProvider.getInstance().getGame().getTreePositions();
+            return trees.size() > 0 ? trees.get(0).getY() : 0;
+        }
 
-		protected FieldHeight() {
-			super("FieldHeight");
-		}
+        @Override
+        public Node copy() {
+            return new TreeY();
+        }
+    }
 
-		@Override
-		public double evaluate() {
-			return SkiProvider.getInstance().getGame().getMaxY();
-		}
+    public static class FieldHeight extends Arity0Node {
 
-		@Override
-		public Node copy() {
-			return new FieldHeight();
-		}
-	}
+        public FieldHeight() {
+            super("FieldHeight");
+        }
 
-	public class FieldWidth extends Arity0Node {
+        @Override
+        public double evaluate() {
+            return SkiProvider.getInstance().getGame().getMaxY();
+        }
 
-		protected FieldWidth() {
-			super("FieldWidth");
-		}
+        @Override
+        public Node copy() {
+            return new FieldHeight();
+        }
+    }
 
-		@Override
-		public double evaluate() {
-			return SkiProvider.getInstance().getGame().getMaxX();
-		}
+    public static class FieldWidth extends Arity0Node {
 
-		@Override
-		public Node copy() {
-			return new FieldWidth();
-		}
-	}
+        public FieldWidth() {
+            super("FieldWidth");
+        }
+
+        @Override
+        public double evaluate() {
+            return SkiProvider.getInstance().getGame().getMaxX();
+        }
+
+        @Override
+        public Node copy() {
+            return new FieldWidth();
+        }
+    }
 
 }

@@ -24,6 +24,6 @@ public class SkiProvider {
     }
 
     public void resetGame() {
-        game = new SkiGame(10, 2.0, 0.03, 1, 0.05, 275, 420);
+        game = new SkiGame(1, 2.0, 0.03, 1, 0.05, 100, 200);
     }
 }
