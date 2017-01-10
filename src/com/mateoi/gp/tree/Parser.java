@@ -3,14 +3,13 @@ package com.mateoi.gp.tree;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mateoi.gp.games.Ski;
 import com.mateoi.gp.tree.functions.ArithmeticNode;
 import com.mateoi.gp.tree.functions.BooleanNode;
 import com.mateoi.gp.tree.functions.Constant;
 import com.mateoi.gp.tree.functions.IfNode;
 import com.mateoi.gp.tree.functions.Negate;
 
-public class Parser {
+public abstract class Parser {
     public Node parse(String s, int depth) {
         s = s.trim();
         int firstSpace = s.indexOf(' ');
@@ -59,22 +58,13 @@ public class Parser {
             return new IfNode(depth, null, null, null);
         } else if ("neg".equals(name)) {
             return new Negate(depth, null);
-        } else if ("Self_X".equals(name)) {
-            return new Ski.SelfX();
-        } else if ("Self_Y".equals(name)) {
-            return new Ski.SelfY();
-        } else if ("Tree_X".equals(name)) {
-            return new Ski.TreeX();
-        } else if ("Tree_Y".equals(name)) {
-            return new Ski.TreeY();
-        } else if ("FieldWidth".equals(name)) {
-            return new Ski.FieldWidth();
-        } else if ("FieldHeight".equals(name)) {
-            return new Ski.FieldHeight();
         } else if (name != null && name.matches("\\d+\\.\\d+")) {
             return new Constant(Double.parseDouble(name));
         } else {
-            return null;
+            return gameSpecificNode(name, depth);
         }
     }
+
+    protected abstract Node gameSpecificNode(String name, int depth);
+
 }

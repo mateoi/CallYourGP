@@ -13,6 +13,7 @@ import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.functions.ArithmeticNode;
 import com.mateoi.gp.tree.functions.Constant;
 import com.mateoi.gp.tree.functions.Negate;
+import com.mateoi.ski.AiPlayer;
 import com.mateoi.ski.Player;
 import com.mateoi.ski.Position;
 import com.mateoi.ski.SkiGame;
@@ -203,4 +204,22 @@ public class Ski implements Game {
         }
     }
 
+    public static class AIGuess extends Arity0Node {
+        private static AiPlayer player = new AiPlayer();
+
+        public AIGuess() {
+            super("AI_guess");
+        }
+
+        @Override
+        public double evaluate() {
+            return player.move(SkiProvider.getInstance().getGame());
+        }
+
+        @Override
+        public Node copy() {
+            return new AIGuess();
+        }
+
+    }
 }

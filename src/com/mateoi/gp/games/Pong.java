@@ -13,6 +13,7 @@ import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.functions.ArithmeticNode;
 import com.mateoi.gp.tree.functions.Constant;
+import com.mateoi.pong.AIPlayer;
 import com.mateoi.pong.Player;
 import com.mateoi.pong.PongGame;
 
@@ -34,11 +35,9 @@ public class Pong implements Game {
         terminals.add(() -> new BallVX());
         terminals.add(() -> new BallVY());
 
-        terminals.add(() -> new SelfX());
         terminals.add(() -> new SelfY());
         terminals.add(() -> new SelfVY());
 
-        terminals.add(() -> new OppX());
         terminals.add(() -> new OppY());
         terminals.add(() -> new OppVY());
 
@@ -144,9 +143,9 @@ public class Pong implements Game {
         return move <= -1 ? -1 : move >= 1 ? 1 : 0;
     }
 
-    public class BallX extends Arity0Node {
+    public static class BallX extends Arity0Node {
 
-        protected BallX() {
+        public BallX() {
             super("Ball_X");
         }
 
@@ -164,9 +163,9 @@ public class Pong implements Game {
         }
     }
 
-    public class BallY extends Arity0Node {
+    public static class BallY extends Arity0Node {
 
-        protected BallY() {
+        public BallY() {
             super("Ball_Y");
         }
 
@@ -181,9 +180,9 @@ public class Pong implements Game {
         }
     }
 
-    public class BallVX extends Arity0Node {
+    public static class BallVX extends Arity0Node {
 
-        protected BallVX() {
+        public BallVX() {
             super("Ball_VX");
         }
 
@@ -198,9 +197,9 @@ public class Pong implements Game {
         }
     }
 
-    public class BallVY extends Arity0Node {
+    public static class BallVY extends Arity0Node {
 
-        protected BallVY() {
+        public BallVY() {
             super("Ball_VY");
         }
 
@@ -215,29 +214,9 @@ public class Pong implements Game {
         }
     }
 
-    public class SelfX extends Arity0Node {
+    public static class SelfY extends Arity0Node {
 
-        protected SelfX() {
-            super("Self_X");
-        }
-
-        @Override
-        public double evaluate() {
-            boolean leftTurn = PongProvider.getInstance().isLeftTurn();
-            Vector2D position = leftTurn ? PongProvider.getInstance().getGame().getLeftPaddleCenter()
-                    : PongProvider.getInstance().getGame().getRightPaddleCenter();
-            return position.getX();
-        }
-
-        @Override
-        public Node copy() {
-            return new SelfX();
-        }
-    }
-
-    public class SelfY extends Arity0Node {
-
-        protected SelfY() {
+        public SelfY() {
             super("Self_Y");
         }
 
@@ -255,9 +234,9 @@ public class Pong implements Game {
         }
     }
 
-    public class SelfVY extends Arity0Node {
+    public static class SelfVY extends Arity0Node {
 
-        protected SelfVY() {
+        public SelfVY() {
             super("Self_VY");
         }
 
@@ -275,29 +254,9 @@ public class Pong implements Game {
         }
     }
 
-    public class OppX extends Arity0Node {
+    public static class OppY extends Arity0Node {
 
-        protected OppX() {
-            super("Opp_X");
-        }
-
-        @Override
-        public double evaluate() {
-            boolean leftTurn = PongProvider.getInstance().isLeftTurn();
-            Vector2D position = !leftTurn ? PongProvider.getInstance().getGame().getLeftPaddleCenter()
-                    : PongProvider.getInstance().getGame().getRightPaddleCenter();
-            return position.getX();
-        }
-
-        @Override
-        public Node copy() {
-            return new OppX();
-        }
-    }
-
-    public class OppY extends Arity0Node {
-
-        protected OppY() {
+        public OppY() {
             super("Opp_Y");
         }
 
@@ -315,9 +274,9 @@ public class Pong implements Game {
         }
     }
 
-    public class OppVY extends Arity0Node {
+    public static class OppVY extends Arity0Node {
 
-        protected OppVY() {
+        public OppVY() {
             super("Opp_VY");
         }
 
@@ -335,9 +294,9 @@ public class Pong implements Game {
         }
     }
 
-    public class PaddleSize extends Arity0Node {
+    public static class PaddleSize extends Arity0Node {
 
-        protected PaddleSize() {
+        public PaddleSize() {
             super("Paddle_Size");
         }
 
@@ -352,9 +311,9 @@ public class Pong implements Game {
         }
     }
 
-    public class FieldWidth extends Arity0Node {
+    public static class FieldWidth extends Arity0Node {
 
-        protected FieldWidth() {
+        public FieldWidth() {
             super("Field_Width");
         }
 
@@ -369,9 +328,9 @@ public class Pong implements Game {
         }
     }
 
-    public class FieldHeight extends Arity0Node {
+    public static class FieldHeight extends Arity0Node {
 
-        protected FieldHeight() {
+        public FieldHeight() {
             super("Field_Height");
         }
 
@@ -384,6 +343,28 @@ public class Pong implements Game {
         public Node copy() {
             return new FieldHeight();
         }
+    }
+
+    public static class AIGuess extends Arity0Node {
+        private static AIPlayer leftPlayer = new AIPlayer(true);
+        private static AIPlayer rightPlayer = new AIPlayer(false);
+
+        public AIGuess() {
+            super("AI_guess");
+        }
+
+        @Override
+        public double evaluate() {
+            boolean isLeftTurn = PongProvider.getInstance().isLeftTurn();
+            AIPlayer player = isLeftTurn ? leftPlayer : rightPlayer;
+            return player.move(PongProvider.getInstance().getGame());
+        }
+
+        @Override
+        public Node copy() {
+            return new AIGuess();
+        }
+
     }
 
 }
