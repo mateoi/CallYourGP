@@ -8,6 +8,8 @@ import com.mateoi.gp.tree.functions.BooleanNode;
 import com.mateoi.gp.tree.functions.Constant;
 import com.mateoi.gp.tree.functions.IfNode;
 import com.mateoi.gp.tree.functions.Negate;
+import com.mateoi.gp.tree.functions.ReadMemory;
+import com.mateoi.gp.tree.functions.WriteMemory;
 
 public abstract class Parser {
     public Node parse(String s, int depth) {
@@ -58,6 +60,10 @@ public abstract class Parser {
             return new IfNode(depth, null, null, null);
         } else if ("neg".equals(name)) {
             return new Negate(depth, null);
+        } else if ("Read".equals(name)) {
+            return new ReadMemory(depth);
+        } else if ("Write".equals(name)) {
+            return new WriteMemory(depth);
         } else if (name != null && name.matches("\\d+\\.\\d+")) {
             return new Constant(Double.parseDouble(name));
         } else {

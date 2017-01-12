@@ -1,12 +1,18 @@
 package com.mateoi.gp.games;
 
+import java.util.function.Supplier;
+
+import com.mateoi.gp.memory.Memory;
 import com.mateoi.pong.PongGame;
 
-public class PongProvider {
+public class PongProvider implements Supplier<Memory> {
 
     private PongGame game;
     private boolean leftTurn;
     private boolean verbose;
+
+    private Memory leftMemory;
+    private Memory rightMemory;
 
     private static PongProvider instance = new PongProvider();
 
@@ -28,6 +34,8 @@ public class PongProvider {
 
     public void resetGame() {
         game = new PongGame(500, 300);
+        leftMemory = new Memory();
+        rightMemory = new Memory();
     }
 
     public boolean isLeftTurn() {
@@ -44,6 +52,11 @@ public class PongProvider {
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+    }
+
+    @Override
+    public Memory get() {
+        return leftTurn ? leftMemory : rightMemory;
     }
 
 }

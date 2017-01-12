@@ -45,6 +45,8 @@ public class Ski implements Game {
         terminals.add(() -> new FieldWidth());
         terminals.add(() -> new FieldHeight());
 
+        terminals.add(() -> new AIGuess());
+
         arity1.add(d -> new Negate(d));
 
         arity2.add(d -> ArithmeticNode.plus(d));

@@ -32,7 +32,7 @@ public class ProportionalRules implements Rules {
     @Override
     public List<Node> bestNodes(List<Node> trees, int n) {
         Map<Node, Double> scores = score(trees);
-        Collections.sort(trees, (t1, t2) -> Double.compare(scores.get(t1), scores.get(t2)));
+        Collections.sort(trees, (t1, t2) -> -1 * Double.compare(scores.get(t1), scores.get(t2)));
         return trees.subList(0, n);
     }
 

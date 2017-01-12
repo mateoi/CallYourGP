@@ -1,11 +1,16 @@
 package com.mateoi.gp.games;
 
+import java.util.function.Supplier;
+
+import com.mateoi.gp.memory.Memory;
 import com.mateoi.ski.SkiGame;
 
-public class SkiProvider {
+public class SkiProvider implements Supplier<Memory> {
 
     private SkiGame game;
     private static SkiProvider instance = new SkiProvider();
+
+    private Memory memory;
 
     public SkiProvider() {
         // nothing here...
@@ -24,6 +29,12 @@ public class SkiProvider {
     }
 
     public void resetGame() {
-        game = new SkiGame(1, 2.0, 0.03, 1, 0.05, 100, 200);
+        game = new SkiGame(3, 2.0, 0.03, 1, 0.05, 150, 250);
+        memory = new Memory();
+    }
+
+    @Override
+    public Memory get() {
+        return memory;
     }
 }

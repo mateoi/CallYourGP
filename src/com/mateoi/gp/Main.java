@@ -19,10 +19,10 @@ public class Main {
 
     public static final int POPULATION = 1000;
     public static final int DEPTH = 6;
-    public static final int GENERATIONS = 30;
+    public static final int GENERATIONS = 40;
     public static final double CROSSOVER_RATE = 0.05;
-    public static final double MUTATION_RATE = 0.85;
-    public static final double INDIVIDUAL_MUTATION_RATE = 0.02;
+    public static final double MUTATION_RATE = 0.9;
+    public static final double INDIVIDUAL_MUTATION_RATE = 0.015;
 
     private List<Node> trees = new ArrayList<>();
     private final Rules rules;
