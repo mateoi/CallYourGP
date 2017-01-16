@@ -7,12 +7,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.mateoi.gp.memory.Memory;
 import com.mateoi.gp.tree.Arity0Node;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.functions.ArithmeticNode;
 import com.mateoi.gp.tree.functions.Constant;
 import com.mateoi.gp.tree.functions.Negate;
+import com.mateoi.gp.tree.functions.ReadMemory;
+import com.mateoi.gp.tree.functions.WriteMemory;
 import com.mateoi.ski.AiPlayer;
 import com.mateoi.ski.Player;
 import com.mateoi.ski.Position;
@@ -23,6 +26,8 @@ public class Ski implements Game {
     private int winningScore = 1000;
 
     public Ski(int rounds) {
+        Memory memory = new Memory();
+        Memory.setMemorySupplier(() -> memory);
         this.rounds = rounds;
 
         List<Function<Integer, Node>> arity1 = new ArrayList<>();
@@ -45,7 +50,10 @@ public class Ski implements Game {
         terminals.add(() -> new FieldWidth());
         terminals.add(() -> new FieldHeight());
 
-        terminals.add(() -> new AIGuess());
+        // terminals.add(() -> new AIGuess());
+
+        arity1.add(d -> new ReadMemory(d));
+        arity2.add(d -> new WriteMemory(d));
 
         arity1.add(d -> new Negate(d));
 

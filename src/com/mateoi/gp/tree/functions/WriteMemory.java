@@ -1,5 +1,8 @@
 package com.mateoi.gp.tree.functions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mateoi.gp.memory.Memory;
 import com.mateoi.gp.tree.Arity2Node;
 import com.mateoi.gp.tree.Node;
@@ -11,11 +14,25 @@ public class WriteMemory extends Arity2Node {
             Memory memory = Memory.getMemorySupplier().get();
             return memory.put(indexD.intValue(), value);
         });
+        createChildren();
+    }
+
+    public WriteMemory(int depth, Node left, Node right) {
+        super("Write", depth, (indexD, value) -> {
+            Memory memory = Memory.getMemorySupplier().get();
+            return memory.put(indexD.intValue(), value);
+        });
+        List<Node> children = new ArrayList<>();
+        children.add(left);
+        children.add(right);
+        setArguments(children);
     }
 
     @Override
     public Node copy() {
-        return new WriteMemory(getDepth());
+        Node left = getArguments().get(0).copy();
+        Node right = getArguments().get(1).copy();
+        return new WriteMemory(getDepth(), left, right);
     }
 
 }

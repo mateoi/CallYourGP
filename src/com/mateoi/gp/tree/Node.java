@@ -139,7 +139,7 @@ public abstract class Node {
             }
         }
         throw new IndexOutOfBoundsException(
-                "index: " + originalIndex + ", size: " + this.size() + "\ntree: " + this + "\nargunents: " + arguments);
+                "index: " + originalIndex + ", size: " + this.size() + "\ntree: " + this + "\narguments: " + arguments);
     }
 
     public int size() {
