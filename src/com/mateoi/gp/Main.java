@@ -11,20 +11,17 @@ import java.util.Map.Entry;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
 import com.mateoi.gp.games.Ski;
-import com.mateoi.gp.games.SkiProvider;
 import com.mateoi.gp.rules.ProportionalRules;
 import com.mateoi.gp.rules.Rules;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.Reproductor;
-import com.mateoi.ski.SkiFXApp;
-import com.mateoi.ski.SkiGame;
 
 public class Main {
 
     public static final int POPULATION = 1000;
     public static final int DEPTH = 6;
-    public static final int GENERATIONS = 50;
+    public static final int GENERATIONS = 500;
     public static final double CROSSOVER_RATE = 0.05;
     public static final double MUTATION_RATE = 0.9;
     public static final double INDIVIDUAL_MUTATION_RATE = 0.015;
@@ -107,29 +104,29 @@ public class Main {
 
         Ski game = new Ski(8);
         Rules rules = new ProportionalRules(game);
-        // for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
+            Main main = new Main(rules);
+            System.out.println(i);
+            List<Snapshot> snapshots = main
+                    .runWithSnapshots(new Reproductor(CROSSOVER_RATE, MUTATION_RATE, INDIVIDUAL_MUTATION_RATE));
+            for (Snapshot s : snapshots) {
+                System.out.println(s);
+            }
+            writeToFile(snapshots, i);
+        }
         // Main main = new Main(rules);
-        // System.out.println(i);
-        // List<Snapshot> snapshots = main
-        // .runWithSnapshots(new Reproductor(CROSSOVER_RATE, MUTATION_RATE,
-        // INDIVIDUAL_MUTATION_RATE));
-        // for (Snapshot s : snapshots) {
-        // System.out.println(s);
-        // }
-        // writeToFile(snapshots, i);
-        // }
-        Main main = new Main(rules);
-        List<Node> nodes = main.run(new Reproductor(CROSSOVER_RATE, MUTATION_RATE, INDIVIDUAL_MUTATION_RATE), 2);
-        System.out.println(nodes.get(0));
-        SkiProvider.getInstance().resetGame();
-        SkiGame skiGame = SkiProvider.getInstance().getGame();
-        SkiFXApp.setGame(skiGame);
-        SkiFXApp.setPlayer(game.nodePlayer(nodes.get(0)));
-        SkiFXApp.launch(SkiFXApp.class);
+        // List<Node> nodes = main.run(new Reproductor(CROSSOVER_RATE,
+        // MUTATION_RATE, INDIVIDUAL_MUTATION_RATE), 2);
+        // System.out.println(nodes.get(0));
+        // SkiProvider.getInstance().resetGame();
+        // SkiGame skiGame = SkiProvider.getInstance().getGame();
+        // SkiFXApp.setGame(skiGame);
+        // SkiFXApp.setPlayer(game.nodePlayer(nodes.get(0)));
+        // SkiFXApp.launch(SkiFXApp.class);
     }
 
     private static void writeToFile(List<Snapshot> snapshots, int iteration) {
-        String filename = "Ski_00_" + iteration + ".csv";
+        String filename = "Ski_11_" + iteration + ".csv";
         String stats = "# " + GENERATIONS + ";" + POPULATION + ";" + DEPTH + ";" + CROSSOVER_RATE + ";" + MUTATION_RATE
                 + ";" + INDIVIDUAL_MUTATION_RATE;
         StringBuilder sb = new StringBuilder(stats);

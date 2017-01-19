@@ -50,7 +50,7 @@ public class Ski implements Game {
         terminals.add(() -> new FieldWidth());
         terminals.add(() -> new FieldHeight());
 
-        // terminals.add(() -> new AIGuess());
+        terminals.add(() -> new AIGuess());
 
         arity1.add(d -> new ReadMemory(d));
         arity2.add(d -> new WriteMemory(d));
