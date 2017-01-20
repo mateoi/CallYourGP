@@ -46,7 +46,12 @@ public class NodeFactory {
         List<Function<Integer, Node>> constructors;
         switch (arity) {
         case 0:
-            return createTerminal();
+            if (Math.random() < terminals.size() / (arity1.size() + terminals.size())) {
+                return createTerminal();
+            } else {
+                int index = randInt(arity1.size());
+                return arity1.get(index).apply(1);
+            }
         case 1:
             constructors = arity1;
             break;

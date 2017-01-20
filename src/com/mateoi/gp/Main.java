@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
-import com.mateoi.gp.games.Ski;
-import com.mateoi.gp.rules.ProportionalRules;
+import com.mateoi.gp.games.Pong;
 import com.mateoi.gp.rules.Rules;
+import com.mateoi.gp.rules.TournamentRules;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.Reproductor;
@@ -22,9 +22,9 @@ public class Main {
     public static final int POPULATION = 1000;
     public static final int DEPTH = 6;
     public static final int GENERATIONS = 500;
-    public static final double CROSSOVER_RATE = 0.05;
-    public static final double MUTATION_RATE = 0.9;
-    public static final double INDIVIDUAL_MUTATION_RATE = 0.015;
+    public static final double CROSSOVER_RATE = 0.25;
+    public static final double MUTATION_RATE = 0.7;
+    public static final double INDIVIDUAL_MUTATION_RATE = 0.03;
 
     private List<Node> trees = new ArrayList<>();
     private final Rules rules;
@@ -87,7 +87,7 @@ public class Main {
     public static void main(String[] args) {
 
         // Pong game = new Pong(3);
-        // Rules rules = new ProportionalRules(game);
+        // Rules rules = new TournamentRules(game);
         // Main main = new Main(rules);
         // List<Node> best = main.run(new Reproductor(CROSSOVER_RATE,
         // MUTATION_RATE, INDIVIDUAL_MUTATION_RATE), 5);
@@ -102,8 +102,8 @@ public class Main {
         // game.nodePlayer(best.get(1)));
         // PongFXApp.launch(PongFXApp.class);
 
-        Ski game = new Ski(8);
-        Rules rules = new ProportionalRules(game);
+        Pong game = new Pong(3);
+        Rules rules = new TournamentRules(game);
         for (int i = 0; i < 10; i++) {
             Main main = new Main(rules);
             System.out.println(i);
@@ -114,6 +114,7 @@ public class Main {
             }
             writeToFile(snapshots, i);
         }
+
         // Main main = new Main(rules);
         // List<Node> nodes = main.run(new Reproductor(CROSSOVER_RATE,
         // MUTATION_RATE, INDIVIDUAL_MUTATION_RATE), 2);
@@ -126,7 +127,7 @@ public class Main {
     }
 
     private static void writeToFile(List<Snapshot> snapshots, int iteration) {
-        String filename = "Ski_11_" + iteration + ".csv";
+        String filename = "Pong_00_" + iteration + ".csv";
         String stats = "# " + GENERATIONS + ";" + POPULATION + ";" + DEPTH + ";" + CROSSOVER_RATE + ";" + MUTATION_RATE
                 + ";" + INDIVIDUAL_MUTATION_RATE;
         StringBuilder sb = new StringBuilder(stats);
