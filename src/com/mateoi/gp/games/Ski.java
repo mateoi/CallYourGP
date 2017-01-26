@@ -27,7 +27,7 @@ public class Ski implements Game {
 
     public Ski(int rounds) {
         Memory memory = new Memory();
-        Memory.setMemorySupplier(() -> memory);
+        Memory.setMemorySupplier(SkiProvider.getInstance());
         this.rounds = rounds;
 
         List<Function<Integer, Node>> arity1 = new ArrayList<>();

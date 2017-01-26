@@ -8,11 +8,15 @@ import java.util.function.Supplier;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
+import com.mateoi.gp.memory.Memory;
 import com.mateoi.gp.tree.Arity0Node;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.functions.ArithmeticNode;
 import com.mateoi.gp.tree.functions.Constant;
+import com.mateoi.gp.tree.functions.Negate;
+import com.mateoi.gp.tree.functions.ReadMemory;
+import com.mateoi.gp.tree.functions.WriteMemory;
 import com.mateoi.pong.AIPlayer;
 import com.mateoi.pong.Player;
 import com.mateoi.pong.PongGame;
@@ -23,6 +27,7 @@ public class Pong implements Game {
     private int winningScore = 10;
 
     public Pong(int rounds) {
+        Memory.setMemorySupplier(PongProvider.getInstance());
         this.rounds = rounds;
 
         List<Function<Integer, Node>> arity1 = new ArrayList<>();
@@ -53,6 +58,13 @@ public class Pong implements Game {
         arity2.add(d -> ArithmeticNode.minus(d));
         arity2.add(d -> ArithmeticNode.times(d));
         arity2.add(d -> ArithmeticNode.div(d));
+
+        // terminals.add(() -> new AIGuess());
+
+        arity1.add((d) -> new ReadMemory(d));
+        arity2.add((d) -> new WriteMemory(d));
+
+        arity1.add(d -> new Negate(d));
 
         // arity2.add(d -> ArithmeticPredicate.equalsNode(d));
         // arity2.add(d -> ArithmeticPredicate.gt(d));

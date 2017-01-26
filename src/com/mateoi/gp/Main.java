@@ -10,9 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
-import com.mateoi.gp.games.Pong;
 import com.mateoi.gp.rules.Rules;
-import com.mateoi.gp.rules.TournamentRules;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.Reproductor;
@@ -86,48 +84,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // Pong game = new Pong(3);
-        // Rules rules = new TournamentRules(game);
-        // Main main = new Main(rules);
-        // List<Node> best = main.run(new Reproductor(CROSSOVER_RATE,
-        // MUTATION_RATE, INDIVIDUAL_MUTATION_RATE), 5);
-        //
-        // System.out.println(best.get(0));
-        // System.out.println(best.get(1));
-        //
-        // PongProvider.getInstance().resetGame();
-        // PongGame pongGame = PongProvider.getInstance().getGame();
-        // PongFXApp.setGame(pongGame);
-        // PongFXApp.setPlayers(game.nodePlayer(best.get(0)),
-        // game.nodePlayer(best.get(1)));
-        // PongFXApp.launch(PongFXApp.class);
-
-        Pong game = new Pong(3);
-        Rules rules = new TournamentRules(game);
-        for (int i = 0; i < 10; i++) {
-            Main main = new Main(rules);
-            System.out.println(i);
-            List<Snapshot> snapshots = main
-                    .runWithSnapshots(new Reproductor(CROSSOVER_RATE, MUTATION_RATE, INDIVIDUAL_MUTATION_RATE));
-            for (Snapshot s : snapshots) {
-                System.out.println(s);
-            }
-            writeToFile(snapshots, i);
-        }
-
-        // Main main = new Main(rules);
-        // List<Node> nodes = main.run(new Reproductor(CROSSOVER_RATE,
-        // MUTATION_RATE, INDIVIDUAL_MUTATION_RATE), 2);
-        // System.out.println(nodes.get(0));
-        // SkiProvider.getInstance().resetGame();
-        // SkiGame skiGame = SkiProvider.getInstance().getGame();
-        // SkiFXApp.setGame(skiGame);
-        // SkiFXApp.setPlayer(game.nodePlayer(nodes.get(0)));
-        // SkiFXApp.launch(SkiFXApp.class);
     }
 
     private static void writeToFile(List<Snapshot> snapshots, int iteration) {
-        String filename = "Pong_00_" + iteration + ".csv";
+        String filename = "Pong_10_" + iteration + ".csv";
         String stats = "# " + GENERATIONS + ";" + POPULATION + ";" + DEPTH + ";" + CROSSOVER_RATE + ";" + MUTATION_RATE
                 + ";" + INDIVIDUAL_MUTATION_RATE;
         StringBuilder sb = new StringBuilder(stats);
