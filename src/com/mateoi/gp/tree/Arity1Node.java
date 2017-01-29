@@ -27,6 +27,7 @@ public abstract class Arity1Node extends Node {
             getArguments().clear();
             getArguments().add(child);
         } catch (NoConstructorsSet e) {
+            System.out.println("No constructors set!");
             System.exit(1);
         }
     }

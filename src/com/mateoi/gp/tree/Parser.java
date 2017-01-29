@@ -19,6 +19,9 @@ public abstract class Parser {
         List<Node> children = new ArrayList<>();
         int bracketLevel = 0;
         int lastOpenBracket = firstSpace;
+        if (firstSpace == -1) {
+            return toNode(name, depth);
+        }
         for (int i = firstSpace; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '(') {
@@ -64,7 +67,7 @@ public abstract class Parser {
             return new ReadMemory(depth);
         } else if ("Write".equals(name)) {
             return new WriteMemory(depth);
-        } else if (name != null && name.matches("\\d+\\.\\d+")) {
+        } else if (name != null && name.matches("-?\\d+\\.\\d+(E[+-]\\d+)?")) {
             return new Constant(Double.parseDouble(name));
         } else {
             return gameSpecificNode(name, depth);

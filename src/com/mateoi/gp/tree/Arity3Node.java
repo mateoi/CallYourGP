@@ -33,6 +33,7 @@ public abstract class Arity3Node extends Node {
             Node child3 = NodeFactory.getInstance().createRandomNode(getDepth() - 1);
             getArguments().add(child3);
         } catch (NoConstructorsSet e) {
+            System.out.println("No constructors set!");
             System.exit(1);
         }
     }

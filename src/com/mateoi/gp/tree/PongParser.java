@@ -35,6 +35,7 @@ public class PongParser extends Parser {
         } else if ("AI_guess".equals(name)) {
             return new Pong.AIGuess();
         } else {
+            System.out.println(name);
             return null;
         }
     }
