@@ -18,7 +18,6 @@ import com.mateoi.gp.tree.functions.Negate;
 import com.mateoi.gp.tree.functions.ReadMemory;
 import com.mateoi.gp.tree.functions.WriteMemory;
 import com.mateoi.pong.AIPlayer;
-import com.mateoi.pong.Player;
 import com.mateoi.pong.PongGame;
 
 public class Pong implements Game {
@@ -126,16 +125,6 @@ public class Pong implements Game {
         scores[0] += game.getLeftHits();
         scores[1] += game.getRightHits();
         return scores;
-    }
-
-    public Player nodePlayer(Node node) {
-        return new Player() {
-            @Override
-            public int move(PongGame state) {
-                double move = node.evaluate();
-                return clipMove((int) move);
-            }
-        };
     }
 
     private int playRound(Node leftPlayer, Node rightPlayer) {

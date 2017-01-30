@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
 import com.mateoi.gp.games.Pong;
+import com.mateoi.gp.games.PongPlayers;
 import com.mateoi.gp.games.PongProvider;
 import com.mateoi.gp.rules.Rules;
 import com.mateoi.gp.rules.TournamentRules;
@@ -71,8 +72,9 @@ public class Main {
         int p1Wins = 0;
         int p1Rallies = 0;
         int p2Rallies = 0;
+        double rounds = 75;
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < rounds; i++) {
             PongProvider.getInstance().resetGame();
             PongGame game = PongProvider.getInstance().getGame();
             while (game.getLeftScore() < 10 && game.getRightScore() < 10) {
@@ -86,29 +88,61 @@ public class Main {
             p1Rallies += game.getLeftHits();
             p2Rallies += game.getRightHits();
         }
-        PongResult r1 = new PongResult(p1Wins / 100., p1Rallies / 100.);
-        PongResult r2 = new PongResult(1 - (p1Wins / 100.), p2Rallies / 100.);
+        PongResult r1 = new PongResult(p1Wins / rounds, p1Rallies / rounds);
+        PongResult r2 = new PongResult(1 - (p1Wins / rounds), p2Rallies / rounds);
         results.add(r1);
         results.add(r2);
         return results;
     }
 
+    private PongResult[][] playMany(Player... players) {
+        PongResult[][] results = new PongResult[players.length][players.length];
+
+        for (int i = 0; i < results.length; i++) {
+            for (int j = i; j < results.length; j++) {
+                List<PongResult> match = play(players[i], players[j]);
+                if (i == j) {
+                    double averageRally = (match.get(0).getAverageRally() + match.get(1).getAverageRally()) / 2;
+                    PongResult head2Head = new PongResult(0.5, averageRally);
+                    results[i][j] = head2Head;
+                } else {
+                    results[i][j] = match.get(0);
+                    results[j][i] = match.get(1);
+                }
+            }
+        }
+        return results;
+    }
+
     public static void main(String[] args) {
         Pong game = new Pong(10);
-
         Main main = new Main(new TournamentRules(game));
-        String[] types = { "10", "11", "01" };
-        for (String type : types) {
-            List<List<Node>> allNodes = main.readFiles(type);
-            List<Node> bestNodes = main.bestByGeneration(allNodes);
-            try {
-                Files.write(Paths.get("best_" + type + ".txt"),
-                        bestNodes.stream().map(n -> n.toString()).collect(Collectors.toList()));
-            } catch (IOException e) {
-                System.out.println("oh no!");
-            }
+        List<Node> gp = main.readBestFile("00");
+        List<Node> gpai = main.readBestFile("01");
+        List<Node> gpm = main.readBestFile("10");
+        List<Node> gpmai = main.readBestFile("11");
+        List<PongResult[][]> results = new ArrayList<>();
 
+        for (int i = 0; i < gp.size(); i++) {
+            System.out.println(i);
+            PongResult[][] generation = main.playMany(PongPlayers.nodePlayer(gp.get(i)),
+                    PongPlayers.nodePlayer(gpai.get(i)), PongPlayers.nodePlayer(gpm.get(i)),
+                    PongPlayers.nodePlayer(gpmai.get(i)), PongPlayers.versatileAI(), PongPlayers.langdonGP(),
+                    PongPlayers.langdonHybridGP());
+            results.add(generation);
         }
+        writeToFile(results);
+
+    }
+
+    private List<Node> readBestFile(String code) {
+        List<String> lines = new ArrayList<>();
+        try {
+            lines = Files.readAllLines(Paths.get("data/pong/best_" + code + ".txt"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return lines.stream().map(s -> parser.parse(s, DEPTH)).collect(Collectors.toList());
     }
 
     private List<Node> bestByGeneration(List<List<Node>> allNodes) {
@@ -156,7 +190,7 @@ public class Main {
 
     private static void writeToFile(List<PongResult[][]> results) {
         String filename = "Pong_Results.txt";
-        String comment = "# 1: GP, 2: GPAI, 3: GPM, 4: GPAIM, 5: AI, 6: BL";
+        String comment = "# 1: GP, 2: GPAI, 3: GPM, 4: GPAIM, 5: AI, 6: BL, 7: BLH";
         StringBuilder sb = new StringBuilder(comment);
         sb.append("\n");
         for (PongResult[][] arr : results) {
