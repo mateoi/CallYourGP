@@ -15,8 +15,28 @@ FILENAME = "D:/Documents/workspace/CallYourGP/Pong_Results.txt"
 def __main__():
     lines = open_lines(FILENAME)
     all_tables = np.array([line_to_table(line) for line in lines])
-    matrix = all_tables[499, :, :, 0]
+    matrix = all_tables[:, :, :, 0].sum(axis=0)
     plot_matrix(matrix)
+    # plt.plot(running_average(all_tables[:,1,6,0]))
+    # plt.plot([0.5]*500)
+    # plt.show()
+
+
+def running_average(array):
+    """
+    Calculates the running average of a numpy array
+    """
+    indices = np.arange(1, array.size + 1)
+    return array.cumsum() / indices
+
+
+def sliding_window_average(array, size):
+    """
+    Calculates the running average of size elements of a numpy array.
+    Taken from:
+    https://stackoverflow.com/questions/13728392/moving-average-or-running-mean
+    """
+    return np.convolve(array, np.ones(size) / size)[size-1:]
 
 
 def plot_matrix(matrix, **kwargs):
