@@ -15,12 +15,17 @@ def __main__():
     average_fitness_01 = get_average_data('max_fitness', False, True)
     average_fitness_11 = get_average_data('max_fitness', True, True)
     generations = range(500)
-    plt.plot(generations, average_fitness_00, 'r',
-             generations, average_fitness_10, 'b',
-             generations, average_fitness_01, 'g',
-             generations, average_fitness_11, 'k')
+    plt.plot(generations, average_fitness_00, 'r', label="GP")
+    plt.plot(generations, average_fitness_10, 'b', label="GPM")
+    plt.plot(generations, average_fitness_01, 'g', label="GPAI")
+    plt.plot(generations, average_fitness_11, 'k', label="GPAIM")
+
+    plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.1), loc=3, ncol=4, mode="expand",
+               borderaxespad=0.)
+    plt.title("Title", y=1.1)
     plt.ylabel("Average fitness")
     plt.xlabel("Generation")
+
     plt.grid(True)
     plt.show()
 

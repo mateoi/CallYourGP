@@ -15,11 +15,38 @@ FILENAME = "D:/Documents/workspace/CallYourGP/Pong_Results.txt"
 def __main__():
     lines = open_lines(FILENAME)
     all_tables = np.array([line_to_table(line) for line in lines])
-    matrix = all_tables[:, :, :, 0].sum(axis=0)
-    plot_matrix(matrix)
-    # plt.plot(running_average(all_tables[:,1,6,0]))
-    # plt.plot([0.5]*500)
-    # plt.show()
+    matrix = all_tables[-1, :, :, 1]
+    plot_matrix(matrix, "Average paddle hits against opponent")
+    # plot_running_averages(all_tables[:, :, :, 1])
+
+
+def plot_running_averages(tables):
+    """
+    Plots the running averages of the four evolved variants in a single figure.
+    """
+    fig, axes = plt.subplots(2, 2, sharey="row")
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(labelcolor='none',
+                    top='off', bottom='off', left='off', right='off')
+    plt.xlabel("Generation")
+    plt.ylabel("Average hits per game")
+    plot_1d_array(running_average(tables[:, 0, 0]), axes[0][0], title="GP")
+    plot_1d_array(running_average(tables[:, 2, 2]), axes[0][1], title="GPM")
+    plot_1d_array(running_average(tables[:, 1, 1]), axes[1][0], title="GPAI")
+    plot_1d_array(running_average(tables[:, 3, 3]), axes[1][1], title="GPAIM")
+    plt.show()
+
+
+def plot_1d_array(array, axis, baseline=None, title=None, **kwargs):
+    """
+    Plots the given array (and possibly a constant baseline) on the given axis.
+    Extra keyword arguments are passed on to plt.plot.
+    """
+    axis.plot(array, **kwargs)
+    if baseline is not None:
+        axis.plot([baseline] * array.size)
+    if title is not None:
+        axis.set_title(title)
 
 
 def running_average(array):
@@ -39,7 +66,7 @@ def sliding_window_average(array, size):
     return np.convolve(array, np.ones(size) / size)[size-1:]
 
 
-def plot_matrix(matrix, **kwargs):
+def plot_matrix(matrix, title, **kwargs):
     """
     Shows a plot of the given matrix. Extra keyword arguments are passed on to
     matshow.
@@ -49,6 +76,9 @@ def plot_matrix(matrix, **kwargs):
     _, axis = plt.subplots()
     axis.matshow(matrix, **kwargs)
     ticks = ["GP", "GPAI", "GPM", "GPAIM", "AI", "BL", "BLH"]
+    plt.title(title)
+    plt.xlabel("Opponent")
+    plt.ylabel("Individual")
     plt.xticks(range(7), ticks)
     plt.yticks(range(7), ticks)
     for (i, j), value in np.ndenumerate(matrix):
