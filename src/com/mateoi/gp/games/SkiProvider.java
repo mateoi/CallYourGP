@@ -29,7 +29,7 @@ public class SkiProvider implements Supplier<Memory> {
     }
 
     public void resetGame() {
-        game = new SkiGame(3, 2.0, 0.03, 1, 0.05, 150, 250);
+        game = new SkiGame(4, 2.0, 0.03, 1.5, 0.05, 150, 250);
         memory = new Memory();
     }
 

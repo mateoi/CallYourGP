@@ -4,51 +4,98 @@ Used to graph data gathered by the gp program
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 BASE_LOCATION = "D:/Documents/workspace/CallYourGP/data/ski/"
-FILENAME_PATTERN = "{}_{}{}_{}.csv"
+FILENAME_PATTERN = "Ski_ct_{}{}_{}.csv"
+AI_FILENAME = "AI_fitness.txt"
 
 
 def __main__():
-    average_fitness_00 = get_average_data('max_fitness')
-    average_fitness_10 = get_average_data('max_fitness', True)
-    average_fitness_01 = get_average_data('max_fitness', False, True)
-    average_fitness_11 = get_average_data('max_fitness', True, True)
-    generations = range(500)
-    plt.plot(generations, average_fitness_00, 'r', label="GP")
-    plt.plot(generations, average_fitness_10, 'b', label="GPM")
-    plt.plot(generations, average_fitness_01, 'g', label="GPAI")
-    plt.plot(generations, average_fitness_11, 'k', label="GPAIM")
+    make_plot()
 
-    plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.1), loc=3, ncol=4, mode="expand",
-               borderaxespad=0.)
-    plt.title("Title", y=1.1)
-    plt.ylabel("Average fitness")
+
+def make_plot():
+    """
+    Makes a plot of the Ski data.
+    """
+    data_00 = get_data(False, False)
+    data_10 = get_data(True, False)
+    data_01 = get_data(False, True)
+    data_11 = get_data(True, True)
+    generations = range(500)
+    plt.plot(generations, average_data(data_00, 'max_fitness'), 'r', label="GP")
+    plt.plot(generations, average_data(data_10, 'max_fitness'), 'b', label="GPM")
+    plt.plot(generations, average_data(data_01, 'max_fitness'), 'g', label="GPAI")
+    plt.plot(generations, average_data(data_11, 'max_fitness'), 'k', label="GPAIM")
+    legend = plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.1), loc=3, ncol=5,
+                        mode="expand", borderaxespad=0.)
+    for legend_object in legend.legendHandles:
+        legend_object.set_linewidth(4.0)
+    plt.title("Maximum fitness for all Ski variants", y=1.1)
+    plt.ylabel("Maximum fitness")
     plt.xlabel("Generation")
 
     plt.grid(True)
     plt.show()
 
 
-def get_average_data(key, has_memory=False, has_ai=False, game="Ski"):
+def node_sizes_per_file(filename):
     """
-    Reads from files with the given properties and returns the average values
-    for each generation for the given key
+    Returns a list of the size of the node in each line of a given Pong file.
     """
-    fnames = [create_filename(i, has_memory, has_ai, game) for i in range(10)]
+    lines = open_lines(filename)
+    return [line.count('(') for line in lines]
+
+
+def get_average_node_sizes(has_memory, has_ai):
+    fnames = [create_filename(i, has_memory, has_ai) for i in range(10)]
+    sizes = np.array([node_sizes_per_file(fname) for fname in fnames])
+    return sizes.mean(axis=0)
+
+
+def get_best_node(data, key='max_fitness'):
+    """
+    Given an array of dictionaries, returns a string representation of the
+    node that has the highest fitness.
+    """
+    values = np.array([[gen[key] for gen in item] for item in data])
+    flat_index = values.argmax()
+    coords = np.unravel_index(flat_index, data.shape)
+    return data[coords]['max_node']
+
+
+def get_data(has_memory=False, has_ai=False):
+    """
+    Reads from files with the given properties and returns the values for each
+    generation.
+    """
+    fnames = [create_filename(i, has_memory, has_ai) for i in range(10)]
     data = [open_lines(file) for file in fnames]
     data = [[line_to_dictionary(gen) for gen in item] for item in data]
-    return average_data(data, key)
+    return np.array(data)
 
 
-def create_filename(index, has_memory=False, has_ai=False, game="Ski"):
+def get_node_size(has_memory=False, has_ai=False):
+    """
+    Reads from files with the given properties and returns the size of the best
+    node for each generation.
+    """
+    fnames = [create_filename(i, has_memory, has_ai) for i in range(10)]
+    data = [open_lines(file) for file in fnames]
+    data = [[gen.count('(') for gen in item] for item in data]
+    return np.array(data)
+
+
+def create_filename(index, has_memory=False, has_ai=False):
     """
     Creates a filename for the data given the dataset required
     """
     memory = 1 if has_memory else 0
     ai_available = 1 if has_ai else 0
-    filename = FILENAME_PATTERN.format(game, memory, ai_available, index)
-    return BASE_LOCATION+filename
+    filename = FILENAME_PATTERN.format(memory, ai_available, index)
+    return BASE_LOCATION + filename
 
 
 def open_lines(filename):
@@ -78,10 +125,26 @@ def average_data(data, key):
     Given a list of lists of dictionaries, gets the values contained in the
     given key in the dictionaries and averages them across all the lists.
     """
-    values = [[gen[key] for gen in item] for item in data]
-    sums = [sum([value[i] for value in values]) for i in range(len(values[0]))]
-    averages = [value / len(values) for value in sums]
-    return averages
+    values = np.array([[gen[key] for gen in item] for item in data])
+    return values.mean(axis=0)
+
+
+def max_data(data, key):
+    """
+    Given a list of lists of dictionaries, gets the values contained in the
+    given key in the dictionaries and returns the maximum across all the lists.
+    """
+    values = np.array([[gen[key] for gen in item] for item in data])
+    return values.max(axis=0)
+
+
+def get_ai_value():
+    """
+    Returns the average of all values in the AI fitness file
+    """
+    lines = open_lines(BASE_LOCATION + AI_FILENAME)
+    as_floats = [float(line) for line in lines]
+    return np.mean(as_floats)
 
 
 __main__()

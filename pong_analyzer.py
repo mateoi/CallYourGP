@@ -9,15 +9,68 @@ import re
 import numpy as np
 from matplotlib import pyplot as plt
 
+BASE_LOCATION = "D:/Documents/workspace/CallYourGP/data/pong/"
+FILENAME_PATTERN = "Pong_{}{}_{}.csv"
 FILENAME = "D:/Documents/workspace/CallYourGP/Pong_Results.txt"
 
 
 def __main__():
-    lines = open_lines(FILENAME)
-    all_tables = np.array([line_to_table(line) for line in lines])
-    matrix = all_tables[-1, :, :, 1]
-    plot_matrix(matrix, "Average paddle hits against opponent")
-    # plot_running_averages(all_tables[:, :, :, 1])
+    a=500
+    sizes_00 = get_average_node_sizes(False, False)
+    sizes_01 = get_average_node_sizes(False, True)
+    sizes_10 = get_average_node_sizes(True, False)
+    sizes_11 = get_average_node_sizes(True, True)
+    print(sizes_00[:a].mean())
+    print(sizes_01[:a].mean())
+    print(sizes_10[:a].mean())
+    print(sizes_11[:a].mean())
+
+    generations = range(500)
+    plt.plot(generations, sizes_00, 'r', label="GP")
+    plt.plot(generations, sizes_10, 'b', label="GPM")
+    # plt.plot(generations, sizes_01, 'g', label="GPAI")
+    # plt.plot(generations, sizes_11, 'k', label="GPAIM")
+    legend = plt.legend(bbox_to_anchor=(0, 1.02, 1, 0.1), loc=3, ncol=5,
+                        mode="expand", borderaxespad=0.)
+    for legend_object in legend.legendHandles:
+        legend_object.set_linewidth(4.0)
+    plt.title("Maximum fitness for all Ski variants", y=1.1)
+    plt.ylabel("Maximum fitness")
+    plt.xlabel("Generation")
+
+    plt.grid(True)
+    plt.show()
+
+
+def node_sizes_per_file(filename):
+    """
+    Returns a list of the size of the node in each line of a given Pong file.
+    """
+    lines = open_lines(filename)
+    return [tree_size(line) for line in lines]
+
+
+def get_average_node_sizes(has_memory, has_ai):
+    fnames = [create_filename(i, has_memory, has_ai) for i in range(10)]
+    sizes = np.array([node_sizes_per_file(fname) for fname in fnames])
+    return sizes.mean(axis=0)
+
+
+def tree_size(tree):
+    """
+    Calculates the number of nodes in a given tree.
+    """
+    return tree.count('(')
+
+
+def create_filename(index, has_memory=False, has_ai=False):
+    """
+    Creates a filename for the data given the dataset required
+    """
+    memory = 1 if has_memory else 0
+    ai_available = 1 if has_ai else 0
+    filename = FILENAME_PATTERN.format(memory, ai_available, index)
+    return BASE_LOCATION + filename
 
 
 def plot_running_averages(tables):

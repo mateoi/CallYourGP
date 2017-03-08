@@ -6,17 +6,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
-import com.mateoi.gp.games.Pong;
-import com.mateoi.gp.games.PongPlayers;
 import com.mateoi.gp.games.PongProvider;
+import com.mateoi.gp.games.Ski;
+import com.mateoi.gp.rules.ProportionalRules;
 import com.mateoi.gp.rules.Rules;
-import com.mateoi.gp.rules.TournamentRules;
 import com.mateoi.gp.tree.Node;
 import com.mateoi.gp.tree.NodeFactory;
 import com.mateoi.gp.tree.Parser;
@@ -28,7 +27,7 @@ import com.mateoi.pong.PongGame;
 public class Main {
 
     public static final int POPULATION = 1000;
-    public static final int DEPTH = 6;
+    public static final int DEPTH = 5;
     public static final int GENERATIONS = 500;
     public static final double CROSSOVER_RATE = 0.25;
     public static final double MUTATION_RATE = 0.7;
@@ -115,24 +114,46 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Pong game = new Pong(10);
-        Main main = new Main(new TournamentRules(game));
-        List<Node> gp = main.readBestFile("00");
-        List<Node> gpai = main.readBestFile("01");
-        List<Node> gpm = main.readBestFile("10");
-        List<Node> gpmai = main.readBestFile("11");
-        List<PongResult[][]> results = new ArrayList<>();
-
-        for (int i = 0; i < gp.size(); i++) {
+        Ski game = new Ski(10);
+        Rules rules = new ProportionalRules(game);
+        for (int i = 8; i < 10; i++) {
+            Main main = new Main(rules);
             System.out.println(i);
-            PongResult[][] generation = main.playMany(PongPlayers.nodePlayer(gp.get(i)),
-                    PongPlayers.nodePlayer(gpai.get(i)), PongPlayers.nodePlayer(gpm.get(i)),
-                    PongPlayers.nodePlayer(gpmai.get(i)), PongPlayers.versatileAI(), PongPlayers.langdonGP(),
-                    PongPlayers.langdonHybridGP());
-            results.add(generation);
+            List<Snapshot> snapshots = main
+                    .runWithSnapshots(new Reproductor(CROSSOVER_RATE, MUTATION_RATE, INDIVIDUAL_MUTATION_RATE));
+            for (Snapshot s : snapshots) {
+                System.out.println(s);
+            }
+            writeToFile(snapshots, i);
         }
-        writeToFile(results);
+    }
 
+    public List<Snapshot> runWithSnapshots(Reproductor reproductor) {
+        List<Snapshot> snapshots = new ArrayList<>();
+        for (int i = 0; i < GENERATIONS; i++) {
+            Map<Node, Double> scores = rules.score(trees);
+            trees = reproductor.nextGeneration(scores);
+            trees = reproductor.increasePopulation(trees, POPULATION);
+            snapshots.add(takeSnapshot(scores, i));
+
+        }
+        return snapshots;
+    }
+
+    private Snapshot takeSnapshot(Map<Node, Double> scores, int round) {
+        double totalFitness = 0;
+        double bestFitness = Double.MIN_VALUE;
+        Node bestNode = null;
+        for (Entry<Node, Double> score : scores.entrySet()) {
+            double fitness = score.getValue();
+            totalFitness += fitness;
+            if (fitness > bestFitness) {
+                bestFitness = fitness;
+                bestNode = score.getKey();
+            }
+        }
+        double averageFitness = totalFitness / scores.size();
+        return new Snapshot(round, averageFitness, bestFitness, bestNode);
     }
 
     private List<Node> readBestFile(String code) {
@@ -188,19 +209,15 @@ public class Main {
 
     }
 
-    private static void writeToFile(List<PongResult[][]> results) {
-        String filename = "Pong_Results.txt";
-        String comment = "# 1: GP, 2: GPAI, 3: GPM, 4: GPAIM, 5: AI, 6: BL, 7: BLH";
-        StringBuilder sb = new StringBuilder(comment);
+    private static void writeToFile(List<Snapshot> snapshots, int iteration) {
+        String filename = "Ski_ct_01_" + iteration + ".csv";
+        String stats = "# " + GENERATIONS + ";" + POPULATION + ";" + DEPTH + ";" + CROSSOVER_RATE + ";" + MUTATION_RATE
+                + ";" + INDIVIDUAL_MUTATION_RATE;
+        StringBuilder sb = new StringBuilder(stats);
         sb.append("\n");
-        for (PongResult[][] arr : results) {
-            sb.append('[');
-            for (PongResult[] line : arr) {
-                sb.append('[');
-                Arrays.stream(line).forEach(r -> sb.append(r + ","));
-                sb.append("]");
-            }
-            sb.append("]\n");
+        for (Snapshot s : snapshots) {
+            sb.append(s);
+            sb.append("\n");
         }
 
         try {

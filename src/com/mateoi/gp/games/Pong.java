@@ -2,9 +2,10 @@ package com.mateoi.gp.games;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
@@ -32,25 +33,25 @@ public class Pong implements Game {
         List<Function<Integer, Node>> arity1 = new ArrayList<>();
         List<Function<Integer, Node>> arity2 = new ArrayList<>();
         List<Function<Integer, Node>> arity3 = new ArrayList<>();
-        List<Supplier<Node>> terminals = new ArrayList<>();
+        List<Function<Integer, Node>> terminals = new ArrayList<>();
 
-        terminals.add(() -> new BallX());
-        terminals.add(() -> new BallY());
-        terminals.add(() -> new BallVX());
-        terminals.add(() -> new BallVY());
+        terminals.add(v -> new BallX());
+        terminals.add(v -> new BallY());
+        terminals.add(v -> new BallVX());
+        terminals.add(v -> new BallVY());
 
-        terminals.add(() -> new SelfY());
-        terminals.add(() -> new SelfVY());
+        terminals.add(v -> new SelfY());
+        terminals.add(v -> new SelfVY());
 
-        terminals.add(() -> new OppY());
-        terminals.add(() -> new OppVY());
+        terminals.add(v -> new OppY());
+        terminals.add(v -> new OppVY());
 
-        terminals.add(() -> new PaddleSize());
-        terminals.add(() -> new FieldWidth());
-        terminals.add(() -> new FieldHeight());
+        terminals.add(v -> new PaddleSize());
+        terminals.add(v -> new FieldWidth());
+        terminals.add(v -> new FieldHeight());
 
         for (int i = 0; i < 20; i++) {
-            terminals.add(() -> new Constant(Math.random() * 8 - 4));
+            terminals.add(v -> new Constant(Math.random() * 8 - 4));
         }
 
         arity2.add(d -> ArithmeticNode.plus(d));
@@ -58,23 +59,19 @@ public class Pong implements Game {
         arity2.add(d -> ArithmeticNode.times(d));
         arity2.add(d -> ArithmeticNode.div(d));
 
-        // terminals.add(() -> new AIGuess());
+        terminals.add(v -> new AIGuess());
 
         arity1.add((d) -> new ReadMemory(d));
         arity2.add((d) -> new WriteMemory(d));
 
         arity1.add(d -> new Negate(d));
 
-        // arity2.add(d -> ArithmeticPredicate.equalsNode(d));
-        // arity2.add(d -> ArithmeticPredicate.gt(d));
-        // arity2.add(d -> BooleanNode.and(d));
-        // arity2.add(d -> BooleanNode.or(d));
-        // arity2.add(d -> BooleanNode.xor(d));
-        //
-        // arity3.add(d -> new IfNode(d));
-
-        NodeFactory.getInstance().setConstructors(arity1, arity2, arity3, terminals);
-
+        Map<Integer, List<Function<Integer, Node>>> constructors = new HashMap<>();
+        constructors.put(0, terminals);
+        constructors.put(1, arity1);
+        constructors.put(2, arity2);
+        constructors.put(3, arity3);
+        NodeFactory.getInstance().setConstructors(constructors);
     }
 
     @Override

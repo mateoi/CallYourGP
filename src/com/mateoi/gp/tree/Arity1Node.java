@@ -4,13 +4,34 @@ import java.util.function.Function;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
 
+/**
+ * Abstract class of nodes that have one child.
+ *
+ * @author mateo
+ *
+ */
 public abstract class Arity1Node extends Node {
 
+    /** Function to evaluate */
     private final Function<Double, Double> function;
 
+    /**
+     * Create a new node with the given name, depth and function.
+     *
+     * @param name
+     * @param depth
+     * @param function
+     */
     public Arity1Node(String name, int depth, Function<Double, Double> function) {
         super(name, depth);
         this.function = function;
+    }
+
+    /**
+     * @return This node's function.
+     */
+    public Function<Double, Double> getFunction() {
+        return function;
     }
 
     @Override

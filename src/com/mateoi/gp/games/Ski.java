@@ -2,9 +2,10 @@ package com.mateoi.gp.games;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.mateoi.gp.memory.Memory;
@@ -26,31 +27,30 @@ public class Ski implements Game {
     private int winningScore = 1000;
 
     public Ski(int rounds) {
-        Memory memory = new Memory();
         Memory.setMemorySupplier(SkiProvider.getInstance());
         this.rounds = rounds;
 
         List<Function<Integer, Node>> arity1 = new ArrayList<>();
         List<Function<Integer, Node>> arity2 = new ArrayList<>();
         List<Function<Integer, Node>> arity3 = new ArrayList<>();
-        List<Supplier<Node>> terminals = new ArrayList<>();
+        List<Function<Integer, Node>> terminals = new ArrayList<>();
 
-        terminals.add(() -> new Constant(-1));
-        terminals.add(() -> new Constant(0));
-        terminals.add(() -> new Constant(1));
+        terminals.add(v -> new Constant(-1));
+        terminals.add(v -> new Constant(0));
+        terminals.add(v -> new Constant(1));
 
         for (int i = 0; i < 10; i++) {
-            terminals.add(() -> new Constant(Math.random() * 6 - 3));
+            terminals.add(v -> new Constant(Math.random() * 6 - 3));
         }
 
-        terminals.add(() -> new SelfX());
-        terminals.add(() -> new SelfY());
-        terminals.add(() -> new TreeX());
-        terminals.add(() -> new TreeY());
-        terminals.add(() -> new FieldWidth());
-        terminals.add(() -> new FieldHeight());
+        terminals.add(v -> new SelfX());
+        terminals.add(v -> new SelfY());
+        terminals.add(v -> new TreeX());
+        terminals.add(v -> new TreeY());
+        terminals.add(v -> new FieldWidth());
+        terminals.add(v -> new FieldHeight());
 
-        terminals.add(() -> new AIGuess());
+        terminals.add(v -> new AIGuess());
 
         arity1.add(d -> new ReadMemory(d));
         arity2.add(d -> new WriteMemory(d));
@@ -62,8 +62,12 @@ public class Ski implements Game {
         arity2.add(d -> ArithmeticNode.times(d));
         arity2.add(d -> ArithmeticNode.div(d));
 
-        NodeFactory.getInstance().setConstructors(arity1, arity2, arity3, terminals);
-
+        Map<Integer, List<Function<Integer, Node>>> constructors = new HashMap<>();
+        constructors.put(0, terminals);
+        constructors.put(1, arity1);
+        constructors.put(2, arity2);
+        constructors.put(3, arity3);
+        NodeFactory.getInstance().setConstructors(constructors);
     }
 
     @Override
@@ -97,6 +101,25 @@ public class Ski implements Game {
 
     private int clipMove(int move) {
         return move <= -1 ? -1 : move >= 1 ? 1 : 0;
+    }
+
+    private static Position closestTree(List<Position> trees, Position player) {
+        double minDistance = Double.MAX_VALUE;
+        Position closest = null;
+        for (Position tree : trees) {
+            double dist = distanceSquared(tree, player);
+            if (dist < minDistance) {
+                minDistance = dist;
+                closest = tree;
+            }
+        }
+        return closest;
+    }
+
+    private static double distanceSquared(Position tree, Position player) {
+        double dx = tree.getX() - player.getX();
+        double dy = tree.getY() - player.getY();
+        return Math.abs(dx * dx + dy * dy);
     }
 
     public Player nodePlayer(Node node) {
@@ -177,6 +200,50 @@ public class Ski implements Game {
         @Override
         public Node copy() {
             return new TreeY();
+        }
+    }
+
+    public static class ClosestTreeX extends Arity0Node {
+
+        public ClosestTreeX() {
+            super("ClosestTreeX");
+        }
+
+        @Override
+        public double evaluate() {
+            List<Position> trees = SkiProvider.getInstance().getGame().getTreePositions();
+            double playerX = SkiProvider.getInstance().getGame().getPlayerX();
+            double playerY = SkiProvider.getInstance().getGame().getPlayerY();
+            Position player = new Position(playerX, playerY);
+            Position closest = closestTree(trees, player);
+            return closest == null ? 0 : closest.getX();
+        }
+
+        @Override
+        public Node copy() {
+            return new ClosestTreeX();
+        }
+    }
+
+    public static class ClosestTreeY extends Arity0Node {
+
+        public ClosestTreeY() {
+            super("ClosestTreeY");
+        }
+
+        @Override
+        public double evaluate() {
+            List<Position> trees = SkiProvider.getInstance().getGame().getTreePositions();
+            double playerX = SkiProvider.getInstance().getGame().getPlayerX();
+            double playerY = SkiProvider.getInstance().getGame().getPlayerY();
+            Position player = new Position(playerX, playerY);
+            Position closest = closestTree(trees, player);
+            return closest == null ? 0 : closest.getY();
+        }
+
+        @Override
+        public Node copy() {
+            return new ClosestTreeY();
         }
     }
 

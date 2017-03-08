@@ -4,12 +4,34 @@ import java.util.function.BiFunction;
 
 import com.mateoi.gp.exceptions.NoConstructorsSet;
 
+/**
+ * Abstract class of nodes with two children.
+ *
+ * @author mateo
+ *
+ */
 public abstract class Arity2Node extends Node {
+
+    /** Function to evaluate */
     private final BiFunction<Double, Double, Double> function;
 
+    /**
+     * Create a new node with the given name, depth and function.
+     *
+     * @param name
+     * @param depth
+     * @param function
+     */
     public Arity2Node(String name, int depth, BiFunction<Double, Double, Double> function) {
         super(name, depth);
         this.function = function;
+    }
+
+    /**
+     * @return This node's function.
+     */
+    public BiFunction<Double, Double, Double> getFunction() {
+        return function;
     }
 
     @Override
@@ -34,9 +56,4 @@ public abstract class Arity2Node extends Node {
             System.exit(1);
         }
     }
-
-    public BiFunction<Double, Double, Double> getFunction() {
-        return function;
-    }
-
 }
