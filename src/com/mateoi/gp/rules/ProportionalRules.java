@@ -8,9 +8,24 @@ import java.util.Map;
 import com.mateoi.gp.games.Game;
 import com.mateoi.gp.tree.Node;
 
+/**
+ * Implements selection rules that simply rank nodes according to their fitness
+ * value as determined by the given Game.
+ *
+ * @author mateo
+ *
+ */
 public class ProportionalRules implements Rules {
+
+    /** Game used to determine Node's fitness values */
     private Game game;
 
+    /**
+     * Create a Rules object that ranks players according to the fitness
+     * function defined in the given game
+     * 
+     * @param game
+     */
     public ProportionalRules(Game game) {
         this.game = game;
     }

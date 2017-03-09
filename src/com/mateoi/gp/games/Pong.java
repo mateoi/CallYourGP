@@ -21,11 +21,25 @@ import com.mateoi.gp.tree.functions.WriteMemory;
 import com.mateoi.pong.AIPlayer;
 import com.mateoi.pong.PongGame;
 
+/**
+ * A Game that implements Pong. Also contains the inner classes that specify
+ * Pong-specific terminals.
+ *
+ * @author mateo
+ *
+ */
 public class Pong implements Game {
 
+    /** The number of rounds to play per matchup */
     private final int rounds;
+    /** The number of points required to win a round */
     private int winningScore = 10;
 
+    /**
+     * Create an instance of Pong that plays the given number of rounds.
+     *
+     * @param rounds
+     */
     public Pong(int rounds) {
         Memory.setMemorySupplier(PongProvider.getInstance());
         this.rounds = rounds;
@@ -105,6 +119,14 @@ public class Pong implements Game {
         return Arrays.asList(leftScore, rightScore);
     }
 
+    /**
+     * Assign a score to two nodes depending on the winner and the number of
+     * balls played
+     *
+     * @param leftPlayer
+     * @param rightPlayer
+     * @return
+     */
     private double[] grade(Node leftPlayer, Node rightPlayer) {
         PongProvider.getInstance().resetGame();
         PongGame game = PongProvider.getInstance().getGame();
@@ -124,23 +146,43 @@ public class Pong implements Game {
         return scores;
     }
 
+    /**
+     * Play a single round of Pong and determine the winner between the two
+     * nodes.
+     *
+     * @param leftPlayer
+     * @param rightPlayer
+     * @return
+     */
     private int playRound(Node leftPlayer, Node rightPlayer) {
         PongProvider.getInstance().resetGame();
         PongGame game = PongProvider.getInstance().getGame();
         while (game.getRightScore() < winningScore && game.getLeftScore() < winningScore) {
             PongProvider.getInstance().setLeftTurn(true);
-            int leftMove = (int) leftPlayer.evaluate();
+            double leftMove = leftPlayer.evaluate();
             PongProvider.getInstance().setLeftTurn(false);
-            int rightMove = (int) rightPlayer.evaluate();
+            double rightMove = rightPlayer.evaluate();
             game.nextFrame(clipMove(leftMove), clipMove(rightMove));
         }
         return game.getLeftScore() >= winningScore ? 0 : 1;
     }
 
-    private int clipMove(int move) {
+    /**
+     * Clip a move into the set of valid moves {-1, 0, 1}.
+     *
+     * @param move
+     * @return
+     */
+    private int clipMove(double move) {
         return move <= -1 ? -1 : move >= 1 ? 1 : 0;
     }
 
+    /**
+     * A terminal node that evaluates to the x-coordinate of the ball
+     *
+     * @author mateo
+     *
+     */
     public static class BallX extends Arity0Node {
 
         public BallX() {
@@ -149,9 +191,6 @@ public class Pong implements Game {
 
         @Override
         public double evaluate() {
-            if (PongProvider.getInstance().isVerbose()) {
-                System.out.println(PongProvider.getInstance().getGame().getBallPosition().getX());
-            }
             return PongProvider.getInstance().getGame().getBallPosition().getX();
         }
 
@@ -161,6 +200,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-coordinate of the ball
+     *
+     * @author mateo
+     *
+     */
     public static class BallY extends Arity0Node {
 
         public BallY() {
@@ -178,6 +223,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the x-velocity of the ball
+     *
+     * @author mateo
+     *
+     */
     public static class BallVX extends Arity0Node {
 
         public BallVX() {
@@ -195,6 +246,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-velocity of the ball
+     *
+     * @author mateo
+     *
+     */
     public static class BallVY extends Arity0Node {
 
         public BallVY() {
@@ -212,6 +269,13 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-coordinate of the center of the
+     * player's paddle
+     *
+     * @author mateo
+     *
+     */
     public static class SelfY extends Arity0Node {
 
         public SelfY() {
@@ -232,6 +296,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the velocity of the player's paddle
+     *
+     * @author mateo
+     *
+     */
     public static class SelfVY extends Arity0Node {
 
         public SelfVY() {
@@ -252,6 +322,13 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-coordinate of the center of the
+     * opponent's paddle
+     *
+     * @author mateo
+     *
+     */
     public static class OppY extends Arity0Node {
 
         public OppY() {
@@ -272,6 +349,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-velocity of the opponent's paddle
+     *
+     * @author mateo
+     *
+     */
     public static class OppVY extends Arity0Node {
 
         public OppVY() {
@@ -292,6 +375,13 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the size of the paddle from the center
+     * to the edge
+     *
+     * @author mateo
+     *
+     */
     public static class PaddleSize extends Arity0Node {
 
         public PaddleSize() {
@@ -309,6 +399,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the total width of the playing field
+     *
+     * @author mateo
+     *
+     */
     public static class FieldWidth extends Arity0Node {
 
         public FieldWidth() {
@@ -326,6 +422,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the total height of the playing field
+     *
+     * @author mateo
+     *
+     */
     public static class FieldHeight extends Arity0Node {
 
         public FieldHeight() {
@@ -343,6 +445,12 @@ public class Pong implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the Pong AI player's best guess
+     *
+     * @author mateo
+     *
+     */
     public static class AIGuess extends Arity0Node {
         private static AIPlayer leftPlayer = new AIPlayer(true);
         private static AIPlayer rightPlayer = new AIPlayer(false);

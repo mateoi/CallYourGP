@@ -17,15 +17,30 @@ import com.mateoi.gp.tree.functions.Constant;
 import com.mateoi.gp.tree.functions.Negate;
 import com.mateoi.gp.tree.functions.ReadMemory;
 import com.mateoi.gp.tree.functions.WriteMemory;
-import com.mateoi.ski.AiPlayer;
+import com.mateoi.ski.AIPlayer;
 import com.mateoi.ski.Player;
 import com.mateoi.ski.Position;
 import com.mateoi.ski.SkiGame;
 
+/**
+ * A Game that implements Ski. Also contains the inner classes that specify
+ * Pong-specific terminals.
+ *
+ * @author mateo
+ *
+ */
 public class Ski implements Game {
+
+    /** The number of rounds to play per try */
     private final int rounds;
+    /** The score to stop the game at, if it is reached */
     private int winningScore = 1000;
 
+    /**
+     * Create an instance of Ski that plays the given number of rounds.
+     *
+     * @param rounds
+     */
     public Ski(int rounds) {
         Memory.setMemorySupplier(SkiProvider.getInstance());
         this.rounds = rounds;
@@ -81,6 +96,12 @@ public class Ski implements Game {
         return Arrays.stream(trees).map(t -> playRounds(t)).collect(Collectors.toList());
     }
 
+    /**
+     * Score the given tree across the pre-specified number of rounds.
+     *
+     * @param tree
+     * @return
+     */
     private double playRounds(Node tree) {
         double total = 0;
         for (int i = 0; i < rounds; i++) {
@@ -89,20 +110,40 @@ public class Ski implements Game {
         return total;
     }
 
+    /**
+     * Play a single round and return the score from that round
+     *
+     * @param tree
+     * @return
+     */
     private double score(Node tree) {
         SkiProvider.getInstance().resetGame();
         SkiGame game = SkiProvider.getInstance().getGame();
         while (game.getScore() < winningScore && !game.isDone()) {
-            int move = (int) tree.evaluate();
+            double move = tree.evaluate();
             game.advanceFrame(clipMove(move));
         }
         return game.getScore();
     }
 
-    private int clipMove(int move) {
+    /**
+     * Clip a move into the set of valid moves {-1, 0, 1}.
+     *
+     * @param move
+     * @return
+     */
+    private int clipMove(double move) {
         return move <= -1 ? -1 : move >= 1 ? 1 : 0;
     }
 
+    /**
+     * Calculate the position of the closest tree by euclidean distance to the
+     * player
+     *
+     * @param trees
+     * @param player
+     * @return
+     */
     private static Position closestTree(List<Position> trees, Position player) {
         double minDistance = Double.MAX_VALUE;
         Position closest = null;
@@ -116,23 +157,42 @@ public class Ski implements Game {
         return closest;
     }
 
+    /**
+     * Calculate the square of the distance between the two positions
+     *
+     * @param tree
+     * @param player
+     * @return
+     */
     private static double distanceSquared(Position tree, Position player) {
         double dx = tree.getX() - player.getX();
         double dy = tree.getY() - player.getY();
         return Math.abs(dx * dx + dy * dy);
     }
 
+    /**
+     * Convert a Node into a Player that can play a graphical game of Ski
+     *
+     * @param node
+     * @return
+     */
     public Player nodePlayer(Node node) {
         return new Player() {
 
             @Override
             public int move(SkiGame game) {
                 double move = node.evaluate();
-                return clipMove((int) move);
+                return clipMove(move);
             }
         };
     }
 
+    /**
+     * A terminal node that evaluates to the x-coordinate of the player
+     *
+     * @author mateo
+     *
+     */
     public static class SelfX extends Arity0Node {
 
         public SelfX() {
@@ -150,6 +210,12 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-coordinate of the player
+     *
+     * @author mateo
+     *
+     */
     public static class SelfY extends Arity0Node {
 
         public SelfY() {
@@ -167,6 +233,13 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the x-coordinate of the tree closest to
+     * the end line
+     *
+     * @author mateo
+     *
+     */
     public static class TreeX extends Arity0Node {
 
         public TreeX() {
@@ -185,6 +258,13 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-coordinate of the tree closest to
+     * the end line
+     *
+     * @author mateo
+     *
+     */
     public static class TreeY extends Arity0Node {
 
         public TreeY() {
@@ -203,6 +283,13 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the x-coordinate of the tree closest to
+     * the player
+     *
+     * @author mateo
+     *
+     */
     public static class ClosestTreeX extends Arity0Node {
 
         public ClosestTreeX() {
@@ -225,6 +312,13 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the y-coordinate of the tree closest to
+     * the player
+     *
+     * @author mateo
+     *
+     */
     public static class ClosestTreeY extends Arity0Node {
 
         public ClosestTreeY() {
@@ -247,6 +341,12 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the total height of the playing field
+     *
+     * @author mateo
+     *
+     */
     public static class FieldHeight extends Arity0Node {
 
         public FieldHeight() {
@@ -255,7 +355,7 @@ public class Ski implements Game {
 
         @Override
         public double evaluate() {
-            return SkiProvider.getInstance().getGame().getMaxY();
+            return SkiProvider.getInstance().getGame().getFieldHeight();
         }
 
         @Override
@@ -264,6 +364,12 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the total width of the playing field
+     *
+     * @author mateo
+     *
+     */
     public static class FieldWidth extends Arity0Node {
 
         public FieldWidth() {
@@ -272,7 +378,7 @@ public class Ski implements Game {
 
         @Override
         public double evaluate() {
-            return SkiProvider.getInstance().getGame().getMaxX();
+            return SkiProvider.getInstance().getGame().getFieldWidth();
         }
 
         @Override
@@ -281,8 +387,14 @@ public class Ski implements Game {
         }
     }
 
+    /**
+     * A terminal node that evaluates to the Pong AI player's best guess
+     *
+     * @author mateo
+     *
+     */
     public static class AIGuess extends Arity0Node {
-        private static AiPlayer player = new AiPlayer();
+        private static AIPlayer player = new AIPlayer();
 
         public AIGuess() {
             super("AI_guess");

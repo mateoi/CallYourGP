@@ -2,6 +2,12 @@ package com.mateoi.gp.tree;
 
 import com.mateoi.gp.games.Pong;
 
+/**
+ * A Parser that converts Pong-specific terminal names into Nodes.
+ *
+ * @author mateo
+ *
+ */
 public class PongParser extends Parser {
 
     public PongParser() {
@@ -35,7 +41,6 @@ public class PongParser extends Parser {
         } else if ("AI_guess".equals(name)) {
             return new Pong.AIGuess();
         } else {
-            System.out.println(name);
             return null;
         }
     }

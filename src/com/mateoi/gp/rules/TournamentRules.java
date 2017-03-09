@@ -10,10 +10,26 @@ import java.util.Map;
 import com.mateoi.gp.games.Game;
 import com.mateoi.gp.tree.Node;
 
+/**
+ * An implementation of tournament selection. Players are randomly matched
+ * against one another, and the winners of each round advance to the next one.
+ * The overall winner receives a score of, and the losers in each round with n
+ * players receive a score of 1/n.
+ *
+ * @author mateo
+ *
+ */
 public class TournamentRules implements Rules {
 
+    /** Game to score individuals by */
     private final Game game;
 
+    /**
+     * Create a Rules object that ranks players according to their position in a
+     * tournament
+     *
+     * @param game
+     */
     public TournamentRules(Game game) {
         this.game = game;
     }
@@ -33,6 +49,13 @@ public class TournamentRules implements Rules {
         return scores;
     }
 
+    /**
+     * Play a single tournament round and return two lists: one of the winners
+     * and one of the losers.
+     * 
+     * @param trees
+     * @return
+     */
     private List<List<Node>> playRound(List<Node> trees) {
         if (trees.size() <= 1) {
             return Arrays.asList(new ArrayList<>(), trees);

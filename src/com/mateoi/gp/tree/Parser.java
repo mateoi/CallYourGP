@@ -11,7 +11,22 @@ import com.mateoi.gp.tree.functions.Negate;
 import com.mateoi.gp.tree.functions.ReadMemory;
 import com.mateoi.gp.tree.functions.WriteMemory;
 
+/**
+ * Abstract class for parsers that convert strings to nodes.
+ *
+ * @author mateo
+ *
+ */
 public abstract class Parser {
+    /**
+     * Parse the given string and create a Node that matches it, with the given
+     * maximum depth. The string must be in the same format as that returned by
+     * the {@link Node#toString()} method.
+     * 
+     * @param s
+     * @param depth
+     * @return
+     */
     public Node parse(String s, int depth) {
         s = s.trim();
         int firstSpace = s.indexOf(' ');
@@ -44,6 +59,13 @@ public abstract class Parser {
         return asNode;
     }
 
+    /**
+     * Convert a node name to a node with the given depth
+     *
+     * @param name
+     * @param depth
+     * @return
+     */
     private Node toNode(String name, int depth) {
         if ("+".equals(name)) {
             return ArithmeticNode.plus(depth);
@@ -74,6 +96,13 @@ public abstract class Parser {
         }
     }
 
+    /**
+     * Parse game-specific nodes
+     *
+     * @param name
+     * @param depth
+     * @return
+     */
     protected abstract Node gameSpecificNode(String name, int depth);
 
 }

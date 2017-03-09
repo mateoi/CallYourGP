@@ -5,26 +5,49 @@ import com.mateoi.pong.AIPlayer;
 import com.mateoi.pong.Player;
 import com.mateoi.pong.PongGame;
 
+/**
+ * Implementations of Langdon and Poli's Pong players
+ *
+ * @author mateo
+ *
+ */
 public class PongPlayers {
 
     private PongPlayers() {
         // private to prevent instantiation
     }
 
-    private static int clipMove(int move) {
+    /**
+     * Clip a move into the set of valid moves {-1, 0, 1}.
+     *
+     * @param move
+     * @return
+     */
+    private static int clipMove(double move) {
         return move <= -1 ? -1 : move >= 1 ? 1 : 0;
     }
 
+    /**
+     * Convert a Node into a Player that can play a graphical game of Pong.
+     *
+     * @param node
+     * @return
+     */
     public static Player nodePlayer(Node node) {
         return new Player() {
             @Override
             public int move(PongGame state) {
                 double move = node.evaluate();
-                return clipMove((int) move);
+                return clipMove(move);
             }
         };
     }
 
+    /**
+     * A Player equivalent to Langdon and Poli's best GP player
+     *
+     * @return
+     */
     public static Player langdonGP() {
         return new Player() {
             @Override
@@ -37,11 +60,16 @@ public class PongPlayers {
                 double constant = 0.62;
 
                 double move = ballVY + constant * ((ballY - selfY) + (ballVY - selfVY));
-                return clipMove((int) move);
+                return clipMove(move);
             }
         };
     }
 
+    /**
+     * A Player equivalent to Langdon and Poli's best hybrid GP player
+     *
+     * @return
+     */
     public static Player langdonHybridGP() {
         return new Player() {
             @Override
@@ -54,11 +82,17 @@ public class PongPlayers {
                 double guess = aiPlayer.move(state);
 
                 double move = 1.34 * ((guess - ballY) + (ballVY - selfVY) + ballVY + 0.69);
-                return clipMove((int) move);
+                return clipMove(move);
             }
         };
     }
 
+    /**
+     * A Player that plays as the Pong AI, but can play on either side of the
+     * board
+     * 
+     * @return
+     */
     public static Player versatileAI() {
         return new Player() {
             private AIPlayer leftPlayer = new AIPlayer(true);

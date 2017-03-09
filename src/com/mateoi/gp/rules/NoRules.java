@@ -7,6 +7,13 @@ import java.util.stream.Collectors;
 
 import com.mateoi.gp.tree.Node;
 
+/**
+ * NoRules is a toy implementation of rules, with uniform selection
+ * (disregarding fitness values) and arbitrary ranking.
+ * 
+ * @author mateo
+ *
+ */
 public class NoRules implements Rules {
 
     public NoRules() {

@@ -2,6 +2,12 @@ package com.mateoi.gp.tree;
 
 import com.mateoi.gp.games.Ski;
 
+/**
+ * A Parser that converts Ski-specific terminal names into Nodes.
+ * 
+ * @author mateo
+ *
+ */
 public class SkiParser extends Parser {
 
     public SkiParser() {
